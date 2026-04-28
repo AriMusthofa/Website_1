@@ -1,7 +1,7 @@
 <?php
     echo "<br><button><a href='msteri1.php' Materi 1 : Variabel dan Tipe Data</a></button>";
     echo "<br><button><a href='msteri2.php' Materi 2 : Kondisi Dan Looping</a></button>";
-    echo "<br><button><a href='msteri3.php' Materi 3 : </a></button>";
+    echo "<br><button><a href='msteri3.php' Materi 3 : Functoon</a></button>";
     echo "<br><button><a href='msteri4.php' Materi 4 : </a></button>";
     echo "<br><button><a href='msteri5.php' Materi 5 : </a></button>";
     echo "<br><button><a href='msteri6.php' Materi 6 : </a></button>";

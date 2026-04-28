@@ -1,37 +1,35 @@
 <?php
-//Function sederhana
-function namaFungsi() {
-    echo "Halo World <br>";
+function sapa()
+{
+    echo "Hallo World";
 }
+sapa();
 
-//Function dengan parameter
-function sapa($nama) {
-    echo "Halo, $nama <br>";
-}
 
-//Function dengan return
-function tambah($a, $b) {
+function tambah(int $a, int $b)
+{
     return $a + $b;
 }
 
-//Function cek genap / ganjil
-function cekGenapGanjil($angka) {
-    if ($angka % 2 == 0) {
-        return "Genap";
-    } else {
-        return "Ganjil";
-    }
+function kali(int $a, int $b)
+{
+    return $a * $b;
 }
+?>
 
-// PEMANGGILAN FUNCTION
 
-namaFungsi(); // panggil fungsi sederhana
+<form method ="POST">
+    Masukkan Angka : <input type="number" name="a"><br>
+    Masukkan Angka : <input type="number" name="b"><br>
+    <input type="submit" value="kirim">
+</form>
 
-sapa("Rohmat"); // panggil dengan parameter
-
-$hasil = tambah(5, 3);
-echo "Hasil penjumlahan: $hasil <br>";
-
-$nilai = 10;
-echo "Angka $nilai adalah " . cekGenapGanjil($nilai);
+<?php
+if (isset($_POST['a']) && ($_POST['b'])) {
+    $angka1 = $_POST['a'];
+    $angka2 = $_POST['b'];
+    echo tambah($angka1, $angka2);
+    echo"<br>";
+    echo kali($angka1, $angka2);
+}
 ?>
