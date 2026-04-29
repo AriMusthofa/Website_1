@@ -33,3 +33,34 @@ if (isset($_POST['a']) && ($_POST['b'])) {
     echo kali($angka1, $angka2);
 }
 ?>
+
+<?php
+function login($username, $password)
+{
+    $userBenar = "admin";
+    $passBenar = "1234";
+
+    if ($username == $userBenar && $password == $passBenar) {
+        return "Login berhasil";
+    } else {
+        return "Login gagal";
+    }
+}
+?>
+
+<form method="POST">
+    Masukan Username:<input type="text" name="username">
+    <br>
+    Masukan Password :<input type="password" name="password">
+    <br>
+    <input type="submit" value="Login">
+</form>
+
+<?php
+if (isset($_POST['username']) && isset($_POST['password'])) {
+    $a = $_POST['username'];
+    $b = $_POST['password'];
+
+    echo login($a, $b);
+}
+?>
