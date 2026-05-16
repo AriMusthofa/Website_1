@@ -1,7 +1,6 @@
 <?php
 include 'koneksi.php';
 
-// HAPUS DATA
 if (isset($_GET['hapus'])) {
     $id = $_GET['hapus'];
 
@@ -10,7 +9,6 @@ if (isset($_GET['hapus'])) {
     header("Location: index.php");
 }
 
-// EDIT DATA
 $edit = false;
 
 if (isset($_GET['edit'])) {
@@ -23,7 +21,6 @@ if (isset($_GET['edit'])) {
     $rowEdit = mysqli_fetch_assoc($data);
 }
 
-// TAMBAH / UPDATE
 if (isset($_POST['kirim'])) {
 
     $username = $_POST['username'];
@@ -31,7 +28,6 @@ if (isset($_POST['kirim'])) {
     $nama = $_POST['nama'];
     $email = $_POST['email'];
 
-    // TAMBAH
     if ($_POST['id'] == "") {
 
         mysqli_query($koneksi, "INSERT INTO user(username,password,nama,email)
@@ -39,7 +35,6 @@ if (isset($_POST['kirim'])) {
 
     } else {
 
-        // UPDATE
         $id = $_POST['id'];
 
         mysqli_query($koneksi, "UPDATE user SET
@@ -65,9 +60,8 @@ if (isset($_POST['kirim'])) {
 
 <div class="container">
 
-    <h1>CRUD DATA USER</h1>
+    <h1>DATA USER</h1>
 
-    <!-- FORM -->
     <div class="card">
 
         <h2><?= $edit ? 'Edit Data' : 'Tambah Data' ?></h2>
@@ -107,7 +101,6 @@ if (isset($_POST['kirim'])) {
         </form>
     </div>
 
-    <!-- TABEL -->
     <div class="card">
 
         <h2>Data User</h2>
