@@ -1,23 +1,47 @@
 <?php
 
 session_start();
+include '../config/koneksi.php';
 
 if(!isset($_SESSION['role'])){
-
 header("Location: ../login.php");
-
 }
 
 if($_SESSION['role']!="admin"){
-
 header("Location: ../login.php");
-
 }
+
+/* TOTAL DATA */
+
+$total_destinasi =
+mysqli_num_rows(
+mysqli_query(
+$koneksi,
+"SELECT * FROM destinasi"
+)
+);
+
+$total_user =
+mysqli_num_rows(
+mysqli_query(
+$koneksi,
+"SELECT * FROM users"
+)
+);
+
+$total_booking =
+mysqli_num_rows(
+mysqli_query(
+$koneksi,
+"SELECT * FROM booking"
+)
+);
 
 ?>
 
 <!DOCTYPE html>
 <html>
+
 <head>
 
 <title>Dashboard Admin</title>
@@ -32,143 +56,438 @@ font-family:Arial,sans-serif;
 }
 
 body{
-background:#f4f6f9;
+background:#eef2f7;
+display:flex;
 }
 
-.navbar{
+/* SIDEBAR */
 
-background:#2c3e50;
-padding:18px;
-display:flex;
-justify-content:space-between;
-align-items:center;
+.sidebar{
+
+width:260px;
+
+height:100vh;
+
+background:#1e293b;
+
 color:white;
 
+padding:30px 20px;
+
+position:fixed;
+
+left:0;
+top:0;
+
 }
 
-.container{
+.logo{
 
-width:90%;
-margin:30px auto;
+font-size:24px;
+
+font-weight:bold;
+
+margin-bottom:40px;
+
+text-align:center;
+
+}
+
+.menu a{
+
+display:block;
+
+padding:15px;
+
+margin-bottom:12px;
+
+background:#334155;
+
+border-radius:12px;
+
+text-decoration:none;
+
+color:white;
+
+transition:0.3s;
+
+}
+
+.menu a:hover{
+
+background:#22c55e;
+
+transform:translateX(6px);
+
+}
+
+/* CONTENT */
+
+.content{
+
+margin-left:260px;
+
+width:100%;
+
+padding:35px;
+
+}
+
+.header{
+
+background:white;
+
+padding:25px;
+
+border-radius:18px;
+
+box-shadow:
+0 5px 20px rgba(0,0,0,0.08);
+
+margin-bottom:30px;
+
+}
+
+.header h1{
+
+color:#1e293b;
+
+margin-bottom:10px;
+
+}
+
+.header p{
+
+color:#64748b;
+
+}
+
+/* CARD */
+
+.cards{
+
+display:grid;
+
+grid-template-columns:
+repeat(auto-fit,minmax(240px,1fr));
+
+gap:25px;
+
+margin-bottom:35px;
 
 }
 
 .card{
 
 background:white;
-padding:25px;
-border-radius:10px;
-box-shadow:0 5px 15px rgba(0,0,0,0.1);
+
+padding:30px;
+
+border-radius:18px;
+
+box-shadow:
+0 5px 20px rgba(0,0,0,0.08);
+
+transition:0.3s;
 
 }
 
-.menu{
+.card:hover{
+
+transform:translateY(-5px);
+
+}
+
+.card h3{
+
+color:#64748b;
+
+margin-bottom:10px;
+
+}
+
+.card h2{
+
+color:#1e293b;
+
+font-size:34px;
+
+}
+
+/* QUICK MENU */
+
+.quick{
 
 display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:20px;
-margin-top:20px;
+
+grid-template-columns:
+repeat(auto-fit,minmax(260px,1fr));
+
+gap:25px;
 
 }
 
-.box{
+.quick-card{
 
-background:#27ae60;
-color:white;
-padding:35px;
+background:white;
+
+padding:30px;
+
+border-radius:18px;
+
+box-shadow:
+0 5px 20px rgba(0,0,0,0.08);
+
 text-align:center;
-border-radius:10px;
-font-size:18px;
+
+transition:0.3s;
 
 }
 
-a{
+.quick-card:hover{
+
+transform:translateY(-6px);
+
+}
+
+.quick-card h2{
+
+color:#1e293b;
+
+margin-bottom:15px;
+
+}
+
+.quick-card p{
+
+color:#64748b;
+
+margin-bottom:20px;
+
+}
+
+.btn{
+
+display:inline-block;
+
+background:#22c55e;
+
+color:white;
+
+padding:12px 22px;
+
+border-radius:12px;
 
 text-decoration:none;
 
 }
 
-.logout{
+/* MOBILE */
 
-background:#e74c3c;
-padding:10px 18px;
-border-radius:8px;
-color:white;
+@media(max-width:900px){
+
+body{
+display:block;
+}
+
+.sidebar{
+
+width:100%;
+
+height:auto;
+
+position:relative;
+
+}
+
+.content{
+
+margin-left:0;
+
+padding:20px;
+
+}
 
 }
 
 </style>
 
 </head>
+
 <body>
 
-<div class="navbar">
+<div class="sidebar">
 
-<h2>Dashboard Admin</h2>
+<div class="logo">
 
-<a
-href="../logout.php"
-class="logout">
-
-Logout
-
-</a>
+ADMIN PANEL
 
 </div>
-
-<div class="container">
-
-<div class="card">
-
-<h2>
-Selamat Datang,
-<?= $_SESSION['username']; ?>
-</h2>
-
-<p>
-Role :
-<?= $_SESSION['role']; ?>
-</p>
 
 <div class="menu">
 
-<a href="destinasi.php">
+<a href="dashboard.php">
 
-<div class="box">
-
-Kelola Destinasi
-
-</div>
+🏠 Dashboard
 
 </a>
 
-<a href="#">
+<a href="destinasi.php">
 
-<div class="box">
-
-Kelola Booking
-
-</div>
+📍 Kelola Destinasi
 
 </a>
 
 <a href="user.php">
 
-<div class="box">
-
-Kelola User
-
-</div>
+👤 Kelola User
 
 </a>
 
-<a href="#">
+<a href="booking.php">
 
-<div class="box">
+📑 Kelola Booking
 
-Laporan
+</a>
+
+<a href="../logout.php">
+
+🚪 Logout
+
+</a>
 
 </div>
+
+</div>
+
+<div class="content">
+
+<div class="header">
+
+<h1>
+
+Selamat Datang,
+<?= $_SESSION['username'] ?>
+
+</h1>
+
+<p>
+
+Dashboard Admin Sistem Booking Wisata
+
+</p>
+
+</div>
+
+<div class="cards">
+
+<div class="card">
+
+<h3>Total Destinasi</h3>
+
+<h2>
+
+<?= $total_destinasi ?>
+
+</h2>
+
+</div>
+
+<div class="card">
+
+<h3>Total User</h3>
+
+<h2>
+
+<?= $total_user ?>
+
+</h2>
+
+</div>
+
+<div class="card">
+
+<h3>Total Booking</h3>
+
+<h2>
+
+<?= $total_booking ?>
+
+</h2>
+
+</div>
+
+</div>
+
+<div class="quick">
+
+<div class="quick-card">
+
+<h2>
+
+📍 Destinasi
+
+</h2>
+
+<p>
+
+Kelola data tempat wisata.
+
+</p>
+
+<a
+href="destinasi.php"
+class="btn">
+
+Buka Menu
+
+</a>
+
+</div>
+
+<div class="quick-card">
+
+<h2>
+
+👤 User
+
+</h2>
+
+<p>
+
+Kelola akun admin & konsumen.
+
+</p>
+
+<a
+href="user.php"
+class="btn">
+
+Buka Menu
+
+</a>
+
+</div>
+
+<div class="quick-card">
+
+<h2>
+
+📑 Booking
+
+</h2>
+
+<p>
+
+Kelola seluruh pemesanan.
+
+</p>
+
+<a
+href="booking.php"
+class="btn">
+
+Buka Menu
 
 </a>
 
