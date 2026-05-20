@@ -1,14 +1,24 @@
 <?php
 
-$host = "localhost";
-$user = "root";
-$pass = "";
-$db   = "db_projek";
+$dbhost = "localhost";
+$dbuser = "root";
+$dbpass = "";
+$dbname = "db_projek";
 
-$koneksi = mysqli_connect($host,$user,$pass,$db);
+$koneksi = mysqli_connect(
+$dbhost,
+$dbuser,
+$dbpass,
+$dbname
+);
 
 if(!$koneksi){
-    die("Koneksi Database Gagal : ".mysqli_connect_error());
+
+die(
+"Koneksi Database Gagal : "
+. mysqli_connect_error()
+);
+
 }
 
 ?>

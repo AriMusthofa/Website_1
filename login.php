@@ -1,169 +1,157 @@
 <?php
+
 session_start();
 include 'config/koneksi.php';
 
+$error = "";
+
 if(isset($_POST['login'])){
 
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+$username =
+mysqli_real_escape_string(
+$koneksi,
+$_POST['username']
+);
 
-    $query = mysqli_query($koneksi,
-    "SELECT * FROM users
-    WHERE username='$username'
-    AND password='$password'");
+$password = $_POST['password'];
 
-    $cek = mysqli_num_rows($query);
+$query =
+mysqli_query(
 
-    if($cek > 0){
+$koneksi,
 
-        $data = mysqli_fetch_assoc($query);
+"SELECT * FROM users
+WHERE username='$username'"
 
-        $_SESSION['id'] = $data['id'];
-        $_SESSION['username'] = $data['username'];
-        $_SESSION['role'] = $data['role'];
+);
 
-        if($data['role']=="admin"){
-            header("Location: admin/dashboard.php");
-        }else{
-            header("Location: user/home.php");
-        }
+if(mysqli_num_rows($query)>0){
 
-    }else{
-        $error = "Username atau Password Salah!";
-    }
+$data =
+mysqli_fetch_assoc($query);
+
+if(
+password_verify(
+$password,
+$data['password']
+)
+){
+
+$_SESSION['id']=$data['id'];
+
+$_SESSION['nama']=$data['nama'];
+
+$_SESSION['username']=$data['username'];
+
+$_SESSION['role']=$data['role'];
+
+if($data['role']=="admin"){
+
+header(
+"Location: admin/dashboard.php"
+);
+
+exit();
+
 }
+
+elseif($data['role']=="guide"){
+
+header(
+"Location: guide/dashboard.php"
+);
+
+exit();
+
+}
+
+elseif($data['role']=="customer"){
+
+header(
+"Location: user/dashboard.php"
+);
+
+exit();
+
+}
+
+}else{
+
+$error =
+"Password salah!";
+
+}
+
+}else{
+
+$error =
+"Username tidak ditemukan!";
+
+}
+
+}
+
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
 
-<title>Login Sembalun Guide</title>
+<title>Login System</title>
 
-<style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
-}
-
-body{
-
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-
-background:
-linear-gradient(
-rgba(0,0,0,0.5),
-rgba(0,0,0,0.5)
-),
-
-url('https://images.unsplash.com/photo-1506744038136-46273834b3fb')
-center/cover;
-
-}
-
-.login-box{
-
-width:400px;
-background:white;
-padding:35px;
-border-radius:15px;
-box-shadow:0 10px 30px rgba(0,0,0,0.3);
-
-}
-
-h2{
-
-text-align:center;
-margin-bottom:25px;
-color:#2c3e50;
-
-}
-
-input{
-
-width:100%;
-padding:13px;
-margin-bottom:15px;
-border:1px solid #ccc;
-border-radius:8px;
-
-}
-
-button{
-
-width:100%;
-padding:13px;
-border:none;
-border-radius:8px;
-background:#27ae60;
-color:white;
-font-size:16px;
-cursor:pointer;
-
-}
-
-button:hover{
-
-background:#219150;
-
-}
-
-.error{
-
-background:#e74c3c;
-color:white;
-padding:10px;
-margin-bottom:15px;
-border-radius:8px;
-text-align:center;
-
-}
-
-.subtitle{
-
-text-align:center;
-margin-bottom:20px;
-color:#666;
-
-}
-
-</style>
+<link rel="stylesheet"
+href="assets/css/style.css">
 
 </head>
-<body>
 
-<div class="login-box">
+<body class="login-body">
 
-<h2>SEMBALUN GUIDE</h2>
+<div class="login-container">
 
-<p class="subtitle">
-Login Admin / Konsumen
+<div class="login-card">
+
+<h1>
+
+LOGIN SISTEM
+
+</h1>
+
+<p>
+
+Admin • Guide • Customer
+
 </p>
 
 <?php
-if(isset($error)){
-echo "<div class='error'>$error</div>";
-}
+if($error!=""){
 ?>
+
+<div class="alert-danger">
+
+<?= $error ?>
+
+</div>
+
+<?php } ?>
 
 <form method="POST">
 
 <input
 type="text"
+
 name="username"
-placeholder="Masukkan Username"
+
+placeholder="Username"
+
 required>
 
 <input
 type="password"
+
 name="password"
-placeholder="Masukkan Password"
+
+placeholder="Password"
+
 required>
 
 <button
@@ -175,6 +163,20 @@ LOGIN
 </button>
 
 </form>
+
+<div class="register-link">
+
+Customer belum punya akun?
+
+<a href="register.php">
+
+Daftar
+
+</a>
+
+</div>
+
+</div>
 
 </div>
 
