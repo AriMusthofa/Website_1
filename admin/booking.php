@@ -3,328 +3,163 @@
 session_start();
 include '../config/koneksi.php';
 
-if(!isset($_SESSION['role'])){
+if(
+!isset($_SESSION['role'])
+||
+$_SESSION['role']!='admin'
+){
 header("Location: ../login.php");
-}
-
-if($_SESSION['role']!="admin"){
-header("Location: ../login.php");
-}
-
-$search="";
-
-/* SEARCH */
-
-if(isset($_GET['search'])){
-$search=$_GET['search'];
-}
-
-/* HAPUS */
-
-if(isset($_GET['hapus'])){
-
-$id=$_GET['hapus'];
-
-mysqli_query(
-$koneksi,
-"DELETE FROM booking WHERE id='$id'"
-);
-
-header(
-"Location: booking.php?pesan=hapus"
-);
-
 exit();
-
 }
 
-/* UPDATE STATUS */
+/* =========================
+ASSIGN GUIDE
+========================= */
 
-if(isset($_POST['update'])){
+if(isset($_POST['assign'])){
 
-$id=$_POST['id'];
-$status=$_POST['status'];
+$booking_id = intval($_POST['booking_id']);
+$guide_id   = intval($_POST['guide_id']);
+
+$cekguide = mysqli_query(
+
+$koneksi,
+
+"SELECT nama
+FROM users
+WHERE id='$guide_id'
+AND role='guide'"
+
+);
+
+$guide = mysqli_fetch_assoc($cekguide);
+
+if($guide){
 
 mysqli_query(
 
 $koneksi,
 
 "UPDATE booking
-SET status='$status'
-WHERE id='$id'"
+SET
+
+guide_id='$guide_id',
+status='Guide Ditugaskan'
+
+WHERE id='$booking_id'"
 
 );
 
-header(
-"Location: booking.php?pesan=update"
+$pesan =
+"Admin menugaskan Anda ke booking #".$booking_id;
+
+mysqli_query(
+
+$koneksi,
+
+"INSERT INTO notifikasi(
+
+guide_id,
+booking_id,
+pesan,
+status_baca
+
+)
+
+VALUES(
+
+'$guide_id',
+'$booking_id',
+'$pesan',
+'Belum Dibaca'
+
+)"
+
 );
 
+}
+
+header("Location: booking.php");
 exit();
 
 }
 
+/* =========================
+LOAD GUIDE
+========================= */
+
+$data_guide =
+mysqli_query(
+
+$koneksi,
+
+"SELECT *
+FROM users
+WHERE role='guide'
+ORDER BY nama ASC"
+
+);
+
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
+
 <head>
 
-<title>CRUD Booking Modern</title>
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Kelola Booking</title>
+
+<link
+rel="stylesheet"
+href="../assets/css/dashboard.css">
 
 <style>
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
-}
-
-body{
-background:#eef2f7;
-}
-
-.container{
-width:92%;
-margin:35px auto;
-}
-
-.card{
-
-background:white;
-
-padding:25px;
-
-border-radius:15px;
-
-box-shadow:
-0 5px 20px rgba(0,0,0,0.08);
-
-}
-
-.back{
-
-display:inline-block;
-
-margin-bottom:20px;
-
-background:#34495e;
-
-color:white;
-
-padding:10px 18px;
-
-border-radius:10px;
-
-text-decoration:none;
-
-}
-
-h2{
-color:#2c3e50;
-margin-bottom:20px;
-}
-
-.search{
-
-display:flex;
-gap:10px;
-
-margin-bottom:25px;
-
-}
-
-.search input{
-
-flex:1;
-
-padding:14px;
-
-border:1px solid #ddd;
-
-border-radius:10px;
-
-}
-
-button{
-
-background:#27ae60;
-
-color:white;
-
-border:none;
-
-padding:12px 18px;
-
-border-radius:10px;
-
-cursor:pointer;
-
-}
-
-table{
-
-width:100%;
-
-border-collapse:collapse;
-
-}
-
-th{
-
-background:#2c3e50;
-color:white;
-
-}
-
-th,td{
-
-padding:15px;
-
-text-align:center;
-
-border-bottom:1px solid #eee;
-
-}
-
-tr:hover{
-
-background:#f8fafc;
-
-}
-
 select{
-
-padding:10px;
-
-border-radius:8px;
-
-border:1px solid #ddd;
-
-}
-
-.hapus{
-
-background:#e74c3c;
-
-color:white;
-
-padding:10px 15px;
-
-border-radius:8px;
-
-text-decoration:none;
-
-}
-
-.badge-pending{
-
-background:#f39c12;
-
-color:white;
-
-padding:8px 12px;
-
-border-radius:20px;
-
-font-size:13px;
-
-}
-
-.badge-terima{
-
-background:#27ae60;
-
-color:white;
-
-padding:8px 12px;
-
-border-radius:20px;
-
-font-size:13px;
-
-}
-
-.badge-tolak{
-
-background:#e74c3c;
-
-color:white;
-
-padding:8px 12px;
-
-border-radius:20px;
-
-font-size:13px;
-
-}
-
-.empty{
-
-padding:25px;
-
-text-align:center;
-
-color:#777;
-
-}
-
-/* ALERT */
-
-.alert{
-
-padding:16px;
-
+padding:12px;
+border:1px solid #d1d5db;
 border-radius:10px;
-
-margin-bottom:20px;
-
-color:white;
-
-font-weight:bold;
-
-animation:fadeout 3s forwards;
-
+outline:none;
+min-width:180px;
+background:#fff;
 }
 
-.success{
-background:#27ae60;
+.status{
+padding:8px 14px;
+border-radius:20px;
+font-size:13px;
+font-weight:700;
+display:inline-block;
 }
 
-.update{
-background:#3498db;
+.status-blue{
+background:#dbeafe;
+color:#1d4ed8;
 }
 
-.delete{
-background:#e74c3c;
+.status-green{
+background:#dcfce7;
+color:#166534;
 }
 
-@keyframes fadeout{
-
-0%{
-opacity:1;
+.status-red{
+background:#fee2e2;
+color:#991b1b;
 }
 
-80%{
-opacity:1;
+.status-yellow{
+background:#fef3c7;
+color:#92400e;
 }
 
-100%{
-opacity:0;
-}
-
-}
-
-@media(max-width:900px){
-
-table{
-font-size:12px;
-}
-
-.container{
-width:98%;
-}
-
+.table-wrapper{
+overflow-x:auto;
 }
 
 </style>
@@ -333,152 +168,179 @@ width:98%;
 
 <body>
 
+<div class="layout">
+
+<?php include 'sidebar.php'; ?>
+
+<div class="main-content">
+
 <div class="container">
 
-<a
-href="dashboard.php"
-class="back">
+<div class="form-card">
 
-← Dashboard
+<h2>
+Kelola Booking Customer
+</h2>
 
-</a>
+<div class="table-wrapper">
 
-<div class="card">
-
-<?php
-
-if(isset($_GET['pesan'])){
-
-if($_GET['pesan']=="update"){
-
-echo "<div class='alert update'>
-Status booking berhasil diupdate.
-</div>";
-
-}
-
-elseif($_GET['pesan']=="hapus"){
-
-echo "<div class='alert delete'>
-Booking berhasil dihapus.
-</div>";
-
-}
-
-}
-
-?>
-
-<h2>Data Booking</h2>
-
-<form
-method="GET"
-class="search">
-
-<input
-type="text"
-
-name="search"
-
-placeholder="Cari user / destinasi..."
-
-value="<?= $search ?>">
-
-<button type="submit">
-
-Cari
-
-</button>
-
-</form>
-
-<table>
+<table class="dashboard-table">
 
 <tr>
 
 <th>ID</th>
-<th>User</th>
+<th>Customer</th>
 <th>Destinasi</th>
 <th>Tanggal</th>
 <th>Jumlah</th>
+<th>Guide</th>
 <th>Status</th>
-<th>Update</th>
-<th>Aksi</th>
+<th>Assign Guide</th>
 
 </tr>
 
 <?php
 
-$query=mysqli_query(
+$query =
+mysqli_query(
 
 $koneksi,
 
-"SELECT booking.*,
-users.username,
-destinasi.nama_destinasi
+"SELECT
+
+booking.*,
+
+users.nama AS customer_nama,
+
+destinasi.name AS destinasi_nama,
+
+guide.nama AS guide_nama
 
 FROM booking
 
-JOIN users
-ON booking.user_id=users.id
+INNER JOIN users
+ON booking.user_id = users.id
 
-JOIN destinasi
-ON booking.destinasi_id=destinasi.id
+INNER JOIN destinasi
+ON booking.destinasi_id = destinasi.id
 
-WHERE
+LEFT JOIN users AS guide
+ON booking.guide_id = guide.id
 
-users.username
-LIKE '%$search%'
-
-OR
-
-destinasi.nama_destinasi
-LIKE '%$search%'"
+ORDER BY booking.id DESC"
 
 );
 
-if(mysqli_num_rows($query)>0){
+if(
+mysqli_num_rows($query)>0
+){
 
-while($row=mysqli_fetch_assoc($query)){
+while(
+$row=
+mysqli_fetch_assoc($query)
+){
 
 ?>
 
 <tr>
 
-<td><?= $row['id'] ?></td>
+<td>
+<?= $row['id'] ?>
+</td>
 
-<td><?= $row['username'] ?></td>
+<td>
+<?= htmlspecialchars($row['customer_nama']) ?>
+</td>
 
-<td><?= $row['nama_destinasi'] ?></td>
+<td>
+<?= htmlspecialchars($row['destinasi_nama']) ?>
+</td>
 
-<td><?= $row['tanggal'] ?></td>
+<td>
 
-<td><?= $row['jumlah_orang'] ?></td>
+<?=
+
+!empty($row['tanggal'])
+
+?
+
+date(
+'d-m-Y',
+strtotime($row['tanggal'])
+)
+
+:
+
+'-'
+
+?>
+
+</td>
+
+<td>
+<?= $row['jumlah_orang'] ?> Orang
+</td>
+
+<td>
+
+<?=
+
+!empty($row['guide_nama'])
+
+?
+
+htmlspecialchars($row['guide_nama'])
+
+:
+
+'-'
+
+?>
+
+</td>
 
 <td>
 
 <?php
 
-if($row['status']=="Pending"){
+$status =
+$row['status'];
 
-echo "<span class='badge-pending'>
-Pending
+if(
+$status=="Guide Ditugaskan"
+){
+
+echo
+"<span class='status status-blue'>
+Guide Ditugaskan
 </span>";
 
 }
+elseif(
+$status=="Diterima Guide"
+){
 
-elseif($row['status']=="Diterima"){
-
-echo "<span class='badge-terima'>
-Diterima
+echo
+"<span class='status status-green'>
+Diterima Guide
 </span>";
 
 }
+elseif(
+$status=="Guide Menolak"
+){
 
+echo
+"<span class='status status-red'>
+Guide Menolak
+</span>";
+
+}
 else{
 
-echo "<span class='badge-tolak'>
-Ditolak
+echo
+"<span class='status status-yellow'>
+".$status."
 </span>";
 
 }
@@ -493,49 +355,67 @@ Ditolak
 
 <input
 type="hidden"
-name="id"
-
+name="booking_id"
 value="<?= $row['id'] ?>">
 
-<select name="status">
+<select
+name="guide_id"
+required>
+
+<option value="">
+Pilih Guide
+</option>
+
+<?php
+
+mysqli_data_seek(
+$data_guide,
+0
+);
+
+while(
+$g=
+mysqli_fetch_assoc($data_guide)
+){
+
+?>
 
 <option
-value="Pending"
 
-<?= ($row['status']=="Pending")
-? 'selected' : '' ?>>
+value="<?= $g['id'] ?>"
 
-Pending
+<?=
+
+(
+$row['guide_id']==$g['id']
+)
+
+?
+
+'selected'
+
+:
+
+''
+
+?>
+
+>
+
+<?= htmlspecialchars($g['nama']) ?>
 
 </option>
 
-<option
-value="Diterima"
-
-<?= ($row['status']=="Diterima")
-? 'selected' : '' ?>>
-
-Diterima
-
-</option>
-
-<option
-value="Ditolak"
-
-<?= ($row['status']=="Ditolak")
-? 'selected' : '' ?>>
-
-Ditolak
-
-</option>
+<?php } ?>
 
 </select>
 
 <button
 type="submit"
-name="update">
+name="assign"
+class="btn btn-primary">
 
-Update
+Assign
 
 </button>
 
@@ -543,36 +423,26 @@ Update
 
 </td>
 
-<td>
-
-<a
-class="hapus"
-
-onclick="return confirm('Hapus booking?')"
-
-href="booking.php?hapus=<?= $row['id'] ?>">
-
-Hapus
-
-</a>
-
-</td>
-
 </tr>
 
 <?php
+
 }
 
 }else{
+
 ?>
 
 <tr>
 
 <td
 colspan="8"
-class="empty">
+style="
+padding:35px;
+text-align:center;
+">
 
-Belum ada data booking.
+Belum ada booking.
 
 </td>
 
@@ -586,5 +456,10 @@ Belum ada data booking.
 
 </div>
 
+</div>
+
+</div>
+
 </body>
+
 </html>

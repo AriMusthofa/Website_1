@@ -1,24 +1,23 @@
 <?php
 
-$dbhost = "localhost";
-$dbuser = "root";
-$dbpass = "";
-$dbname = "db_projek";
+$host = "localhost";
+$user = "root";
+$pass = "";
+$db   = "Projek_CRUD";
 
 $koneksi = mysqli_connect(
-$dbhost,
-$dbuser,
-$dbpass,
-$dbname
+    $host,
+    $user,
+    $pass,
+    $db
 );
 
 if(!$koneksi){
-
-die(
-"Koneksi Database Gagal : "
-. mysqli_connect_error()
-);
-
+    die(
+        "Koneksi gagal: "
+        .
+        mysqli_connect_error()
+    );
 }
 
 ?>

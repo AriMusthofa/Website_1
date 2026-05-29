@@ -1,492 +1,653 @@
 <?php
 
-session_start();
-include '../config/koneksi.php';
+require_once '../config/koneksi.php';
+require_once '../config/security.php';
 
-if(!isset($_SESSION['role'])){
-header("Location: ../login.php");
+requireRole('admin');
+
+$success = '';
+$error   = '';
+
+/*
+==================================
+AUTO CREATE FOLDER UPLOAD
+==================================
+*/
+
+$upload_dir = "../upload/";
+
+if (!file_exists($upload_dir)) {
+    mkdir($upload_dir,0777,true);
 }
 
-if($_SESSION['role']!="admin"){
-header("Location: ../login.php");
+/*
+==================================
+FUNCTION VALIDATE IMAGE
+==================================
+*/
+
+if(!function_exists('validateImage')){
+
+function validateImage($file){
+
+    $allowed = ['jpg','jpeg','png','webp'];
+
+    $ext = strtolower(
+        pathinfo(
+            $file['name'],
+            PATHINFO_EXTENSION
+        )
+    );
+
+    if(!in_array($ext,$allowed)){
+        return 'Format gambar harus JPG, PNG, atau WEBP.';
+    }
+
+    if($file['size'] > 5000000){
+        return 'Ukuran gambar maksimal 5MB.';
+    }
+
+    return true;
 }
 
-$edit=false;
-$search="";
-
-/* SEARCH */
-
-if(isset($_GET['search'])){
-$search=$_GET['search'];
 }
 
-/* HAPUS */
+if(!function_exists('randomFileName')){
+
+function randomFileName($file){
+
+    $ext = strtolower(
+        pathinfo(
+            $file['name'],
+            PATHINFO_EXTENSION
+        )
+    );
+
+    return uniqid()."_destinasi.".$ext;
+}
+
+}
+
+/*
+==================================
+DELETE
+==================================
+*/
 
 if(isset($_GET['hapus'])){
 
-$id=$_GET['hapus'];
+verifyCsrf();
+
+$id = intval($_GET['hapus']);
+
+$cek = mysqli_query(
+    $koneksi,
+    "SELECT image
+    FROM destinasi
+    WHERE id='$id'"
+);
+
+$datahapus = mysqli_fetch_assoc($cek);
+
+if(
+    !empty($datahapus['image'])
+    &&
+    file_exists(
+        $upload_dir.$datahapus['image']
+    )
+){
+
+unlink(
+    $upload_dir.$datahapus['image']
+);
+
+}
 
 mysqli_query(
-$koneksi,
-"DELETE FROM destinasi WHERE id='$id'"
+    $koneksi,
+    "DELETE FROM destinasi
+    WHERE id='$id'"
 );
 
-header(
-"Location: destinasi.php?pesan=hapus"
-);
-
+header("Location: destinasi.php");
 exit();
 
 }
 
-/* EDIT */
+/*
+==================================
+EDIT MODE
+==================================
+*/
+
+$edit = false;
+
+$id_edit='';
+
+$name='';
+
+$altitude='';
+
+$difficulty='';
+
+$diff_key='';
+
+$duration='';
+
+$dur_key='';
+
+$price='';
+
+$price_num='';
+
+$image='';
+
+$popular=0;
 
 if(isset($_GET['edit'])){
 
 $edit=true;
 
-$id=$_GET['edit'];
+$id_edit = intval($_GET['edit']);
 
-$data=mysqli_query(
-$koneksi,
-"SELECT * FROM destinasi WHERE id='$id'"
+$q_edit = mysqli_query(
+    $koneksi,
+    "SELECT *
+    FROM destinasi
+    WHERE id='$id_edit'"
 );
 
-$rowEdit=mysqli_fetch_assoc($data);
+$data_edit = mysqli_fetch_assoc($q_edit);
+
+if($data_edit){
+
+$name       = $data_edit['name'];
+$altitude   = $data_edit['altitude'];
+$difficulty = $data_edit['difficulty'];
+$diff_key   = $data_edit['diff_key'];
+$duration   = $data_edit['duration'];
+$dur_key    = $data_edit['dur_key'];
+$price      = $data_edit['price'];
+$price_num  = $data_edit['price_num'];
+$image      = $data_edit['image'];
+$popular    = $data_edit['popular'];
 
 }
 
-/* TAMBAH / UPDATE */
-
-if(isset($_POST['simpan'])){
-
-$nama=$_POST['nama_destinasi'];
-$lokasi=$_POST['lokasi'];
-$harga=$_POST['harga'];
-$deskripsi=$_POST['deskripsi'];
-
-$gambar="";
-
-if($_FILES['gambar']['name']!=""){
-
-$gambar=time()."_".$_FILES['gambar']['name'];
-
-$tmp=$_FILES['gambar']['tmp_name'];
-
-move_uploaded_file(
-$tmp,
-"../uploads/".$gambar
-);
-
 }
 
-if($_POST['id']==""){
+/*
+==================================
+INSERT
+==================================
+*/
 
-mysqli_query(
+if(isset($_POST['tambah'])){
 
-$koneksi,
+verifyCsrf();
 
-"INSERT INTO destinasi
-(nama_destinasi,lokasi,harga,deskripsi,gambar)
+$name       = e($_POST['name']);
+$altitude   = e($_POST['altitude']);
+$difficulty = e($_POST['difficulty']);
+$diff_key   = e($_POST['diff_key']);
+$duration   = e($_POST['duration']);
+$dur_key    = e($_POST['dur_key']);
+$price      = e($_POST['price']);
+$price_num  = intval($_POST['price_num']);
 
-VALUES
+$popular =
+isset($_POST['popular'])
+?
+1
+:
+0;
 
-('$nama','$lokasi','$harga','$deskripsi','$gambar')"
+$image='';
 
+if(
+isset($_FILES['image'])
+&&
+$_FILES['image']['error']==0
+){
+
+$validasi =
+validateImage(
+$_FILES['image']
 );
 
-header(
-"Location: destinasi.php?pesan=tambah"
-);
+if($validasi!==true){
 
-exit();
+$error=$validasi;
 
 }else{
 
-$id=$_POST['id'];
+$image=
+randomFileName(
+$_FILES['image']
+);
 
-if($gambar==""){
-$gambar=$rowEdit['gambar'];
+move_uploaded_file(
+$_FILES['image']['tmp_name'],
+$upload_dir.$image
+);
+
 }
 
-mysqli_query(
+}
+
+if(empty($error)){
+
+$stmt = mysqli_prepare(
 
 $koneksi,
 
-"UPDATE destinasi SET
+"INSERT INTO destinasi(
 
-nama_destinasi='$nama',
-lokasi='$lokasi',
-harga='$harga',
-deskripsi='$deskripsi',
-gambar='$gambar'
+name,
+altitude,
+difficulty,
+diff_key,
+duration,
+dur_key,
+price,
+price_num,
+image,
+popular
 
-WHERE id='$id'"
+)
+
+VALUES(
+
+?,
+?,
+?,
+?,
+?,
+?,
+?,
+?,
+?,
+?
+
+)"
 
 );
 
-header(
-"Location: destinasi.php?pesan=update"
+mysqli_stmt_bind_param(
+
+$stmt,
+
+"sssssssisi",
+
+$name,
+$altitude,
+$difficulty,
+$diff_key,
+$duration,
+$dur_key,
+$price,
+$price_num,
+$image,
+$popular
+
 );
 
-exit();
+if(
+mysqli_stmt_execute($stmt)
+){
+
+$success='Destinasi berhasil ditambahkan.';
+
+}else{
+
+$error='Gagal menambahkan destinasi.';
+
+}
+
+mysqli_stmt_close($stmt);
 
 }
 
 }
 
+/* ==========================
+UPDATE
+========================== */
+
+if(isset($_POST['update'])){
+
+    verifyCsrf();
+
+    $id_update = intval($_POST['id']);
+
+    $name        = e($_POST['name']);
+    $altitude    = e($_POST['altitude']);
+    $difficulty  = e($_POST['difficulty']);
+    $diff_key    = e($_POST['diff_key']);
+    $duration    = e($_POST['duration']);
+    $dur_key     = e($_POST['dur_key']);
+    $price       = e($_POST['price']);
+    $price_num   = intval($_POST['price_num']);
+    $popular     = isset($_POST['popular']) ? 1 : 0;
+
+    $gambar_old  = $_POST['gambar_lama'];
+    $gambar_final = $gambar_old;
+
+    if(isset($_FILES['image']) && $_FILES['image']['error']==0){
+
+        $validasi = validateImage($_FILES['image']);
+
+        if($validasi!==true){
+
+            $error = $validasi;
+
+        }else{
+
+            $gambar_baru = randomFileName($_FILES['image']);
+
+            move_uploaded_file(
+                $_FILES['image']['tmp_name'],
+                "../upload/".$gambar_baru
+            );
+
+            if(
+                !empty($gambar_old)
+                &&
+                file_exists("../upload/".$gambar_old)
+            ){
+                unlink("../upload/".$gambar_old);
+            }
+
+            $gambar_final = $gambar_baru;
+        }
+    }
+
+    if(empty($error)){
+
+        $stmt = mysqli_prepare(
+
+            $koneksi,
+
+            "UPDATE destinasi SET
+
+            name=?,
+            altitude=?,
+            difficulty=?,
+            diff_key=?,
+            duration=?,
+            dur_key=?,
+            price=?,
+            price_num=?,
+            image=?,
+            popular=?
+
+            WHERE id=?"
+
+        );
+
+        mysqli_stmt_bind_param(
+
+            $stmt,
+
+            "sssssssdsii",
+
+            $name,
+            $altitude,
+            $difficulty,
+            $diff_key,
+            $duration,
+            $dur_key,
+            $price,
+            $price_num,
+            $gambar_final,
+            $popular,
+            $id_update
+
+        );
+
+        mysqli_stmt_execute($stmt);
+
+        mysqli_stmt_close($stmt);
+
+        header("Location: destinasi.php");
+
+        exit();
+    }
+}
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
 
-<title>CRUD Destinasi Modern</title>
+<meta charset="UTF-8">
 
-<style>
+<title>Kelola Destinasi</title>
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
-}
-
-body{
-background:#eef2f7;
-}
-
-.container{
-width:92%;
-margin:35px auto;
-}
-
-.card{
-
-background:white;
-padding:25px;
-
-border-radius:15px;
-
-margin-bottom:30px;
-
-box-shadow:
-0 5px 20px rgba(0,0,0,0.08);
-
-}
-
-h2{
-color:#2c3e50;
-margin-bottom:20px;
-}
-
-input,textarea{
-
-width:100%;
-padding:14px;
-
-margin-bottom:15px;
-
-border:1px solid #dcdcdc;
-border-radius:10px;
-
-outline:none;
-
-}
-
-input:focus,
-textarea:focus{
-
-border-color:#27ae60;
-
-}
-
-button{
-
-background:#27ae60;
-color:white;
-
-padding:12px 22px;
-
-border:none;
-border-radius:10px;
-
-cursor:pointer;
-
-}
-
-.search{
-
-display:flex;
-gap:10px;
-
-margin-bottom:25px;
-
-}
-
-.search input{
-margin-bottom:0;
-}
-
-table{
-
-width:100%;
-border-collapse:collapse;
-
-}
-
-th{
-
-background:#2c3e50;
-color:white;
-
-}
-
-th,td{
-
-padding:15px;
-text-align:center;
-
-border-bottom:1px solid #eee;
-
-}
-
-tr:hover{
-
-background:#f8fafc;
-
-}
-
-img{
-
-width:90px;
-height:70px;
-
-object-fit:cover;
-
-border-radius:10px;
-
-}
-
-.edit{
-
-background:#f39c12;
-color:white;
-
-padding:10px 16px;
-
-border-radius:8px;
-
-text-decoration:none;
-
-margin-right:5px;
-
-}
-
-.hapus{
-
-background:#e74c3c;
-color:white;
-
-padding:10px 16px;
-
-border-radius:8px;
-
-text-decoration:none;
-
-}
-
-.back{
-
-display:inline-block;
-
-margin-bottom:20px;
-
-background:#34495e;
-
-color:white;
-
-padding:10px 18px;
-
-border-radius:10px;
-
-text-decoration:none;
-
-}
-
-.empty{
-
-padding:25px;
-color:#777;
-text-align:center;
-
-}
-
-/* ALERT */
-
-.alert{
-
-padding:16px;
-border-radius:10px;
-
-margin-bottom:20px;
-
-color:white;
-font-weight:bold;
-
-animation:fadeout 3s forwards;
-
-}
-
-.success{
-background:#27ae60;
-}
-
-.update{
-background:#3498db;
-}
-
-.delete{
-background:#e74c3c;
-}
-
-@keyframes fadeout{
-
-0%{
-opacity:1;
-}
-
-80%{
-opacity:1;
-}
-
-100%{
-opacity:0;
-}
-
-}
-
-@media(max-width:900px){
-
-table{
-font-size:13px;
-}
-
-.container{
-width:98%;
-}
-
-}
-
-</style>
+<link
+rel="stylesheet"
+href="../assets/css/dashboard.css">
 
 </head>
+
 <body>
+
+<div class="layout">
+
+<?php include 'sidebar.php'; ?>
+
+<div class="main-content">
 
 <div class="container">
 
-<a
-href="dashboard.php"
-class="back">
-
-← Dashboard
-
-</a>
-
 <div class="card">
-
-<?php
-
-if(isset($_GET['pesan'])){
-
-if($_GET['pesan']=="tambah"){
-
-echo "<div class='alert success'>
-Data berhasil ditambahkan.
-</div>";
-
-}
-
-elseif($_GET['pesan']=="update"){
-
-echo "<div class='alert update'>
-Data berhasil diupdate.
-</div>";
-
-}
-
-elseif($_GET['pesan']=="hapus"){
-
-echo "<div class='alert delete'>
-Data berhasil dihapus.
-</div>";
-
-}
-
-}
-
-?>
 
 <h2>
 
-<?= $edit ? 'Edit Destinasi' : 'Tambah Destinasi' ?>
+<?= $edit ? 'EDIT DESTINASI' : 'TAMBAH DESTINASI' ?>
 
 </h2>
 
-<form
-method="POST"
-enctype="multipart/form-data">
+<form method="POST" enctype="multipart/form-data">
+
+<input
+type="hidden"
+name="csrf_token"
+value="<?= csrf() ?>">
+
+<?php if($edit){ ?>
 
 <input
 type="hidden"
 name="id"
+value="<?= $id_edit ?>">
 
-value="<?= $edit ? $rowEdit['id'] : '' ?>">
+<input
+type="hidden"
+name="gambar_lama"
+value="<?= $gambar_lama ?>">
+
+<?php } ?>
+
+<div class="form-grid">
+
+<div class="form-group">
+
+<label>Nama Destinasi</label>
 
 <input
 type="text"
-name="nama_destinasi"
+name="name"
+required
+value="<?= htmlspecialchars($name) ?>">
 
-placeholder="Nama Destinasi"
+</div>
 
-value="<?= $edit ? $rowEdit['nama_destinasi'] : '' ?>"
+<div class="form-group">
 
-required>
+<label>Altitude</label>
 
 <input
 type="text"
-name="lokasi"
+name="altitude"
+placeholder="3.726 mdpl"
+required
+value="<?= htmlspecialchars($altitude) ?>">
 
-placeholder="Lokasi"
+</div>
 
-value="<?= $edit ? $rowEdit['lokasi'] : '' ?>"
+<div class="form-group">
 
-required>
+<label>Difficulty</label>
+
+<select name="difficulty">
+
+<option value="Mudah">Mudah</option>
+
+<option value="Menengah">Menengah</option>
+
+<option value="Sulit">Sulit</option>
+
+</select>
+
+</div>
+
+<div class="form-group">
+
+<label>Diff Key</label>
+
+<input
+type="text"
+name="diff_key"
+placeholder="mudah / menengah / sulit"
+required
+value="<?= htmlspecialchars($diff_key) ?>">
+
+</div>
+
+<div class="form-group">
+
+<label>Duration</label>
+
+<input
+type="text"
+name="duration"
+placeholder="2 - 3 Hari"
+required
+value="<?= htmlspecialchars($duration) ?>">
+
+</div>
+
+<div class="form-group">
+
+<label>Dur Key</label>
+
+<input
+type="text"
+name="dur_key"
+placeholder="2-3-hari"
+required
+value="<?= htmlspecialchars($dur_key) ?>">
+
+</div>
+
+<div class="form-group">
+
+<label>Price</label>
+
+<input
+type="text"
+name="price"
+placeholder="Mulai Rp 800.000"
+required
+value="<?= htmlspecialchars($price) ?>">
+
+</div>
+
+<div class="form-group">
+
+<label>Price Number</label>
 
 <input
 type="number"
-name="harga"
+name="price_num"
+required
+value="<?= htmlspecialchars($price_num) ?>">
 
-placeholder="Harga"
+</div>
 
-value="<?= $edit ? $rowEdit['harga'] : '' ?>"
+<div class="form-group full-width">
 
-required>
+<label>Upload Gambar</label>
 
-<textarea
-name="deskripsi"
+<label class="upload-box">
 
-placeholder="Deskripsi"><?= $edit ? $rowEdit['deskripsi'] : '' ?></textarea>
+<div class="upload-icon">📷</div>
+
+<div class="upload-text">
+
+Klik untuk upload gambar destinasi
+
+</div>
 
 <input
 type="file"
-name="gambar">
+name="image"
+accept="image/*"
+onchange="previewImage(event)">
+
+</label>
+
+<div class="preview-wrapper">
+
+<img
+
+id="preview"
+
+src="<?=
+(!empty($image_lama))
+?
+'../uploads/'.$image_lama
+:
+'https://placehold.co/600x400?text=Preview'
+?>">
+
+</div>
+
+</div>
+
+<div class="full-width checkbox-box">
+
+<input
+type="checkbox"
+name="popular"
+value="1"
+<?= (!empty($popular)) ? 'checked' : '' ?>>
+
+<label>Jadikan destinasi populer</label>
+
+</div>
+
+</div>
 
 <button
+class="btn-primary"
 type="submit"
-name="simpan">
+name="<?= $edit ? 'update' : 'tambah' ?>">
 
-<?= $edit ? 'UPDATE' : 'SIMPAN' ?>
+<?=
+
+$edit
+
+?
+
+'UPDATE DESTINASI'
+
+:
+
+'TAMBAH DESTINASI'
+
+?>
 
 </button>
 
@@ -494,128 +655,448 @@ name="simpan">
 
 </div>
 
-<div class="card">
+<div class="card" style="margin-top:40px;">
 
-<h2>Data Destinasi</h2>
+<h2>DATA DESTINASI</h2>
 
-<form
-method="GET"
-class="search">
-
-<input
-type="text"
-
-name="search"
-
-placeholder="Cari destinasi..."
-
-value="<?= $search ?>">
-
-<button type="submit">
-
-Cari
-
-</button>
-
-</form>
-
-<table>
+<table border="1" cellpadding="10">
 
 <tr>
 
 <th>ID</th>
-<th>Gambar</th>
-<th>Nama</th>
-<th>Lokasi</th>
-<th>Harga</th>
+<th>Image</th>
+<th>Name</th>
+<th>Altitude</th>
+<th>Difficulty</th>
+<th>Duration</th>
+<th>Price</th>
+<th>Popular</th>
 <th>Aksi</th>
 
 </tr>
 
 <?php
 
-$query=mysqli_query(
+$query = mysqli_query(
 
 $koneksi,
 
 "SELECT * FROM destinasi
-WHERE nama_destinasi
-LIKE '%$search%'"
+ORDER BY id DESC"
 
 );
 
-if(mysqli_num_rows($query)>0){
-
-while($row=mysqli_fetch_assoc($query)){
+while($row = mysqli_fetch_assoc($query)){
 
 ?>
 
 <tr>
 
-<td><?= $row['id'] ?></td>
+<td>
+
+<?= $row['id'] ?>
+
+</td>
 
 <td>
 
 <?php
-if($row['gambar']!=""){
+if(!empty($row['image'])){
 ?>
 
 <img
-src="../uploads/<?= $row['gambar'] ?>">
+src="../uploads/<?= $row['image'] ?>"
+style="
+width:80px;
+height:80px;
+object-fit:cover;
+border-radius:10px;
+">
+<style>
 
-<?php } ?>
+:root{
+--primary:#2563eb;
+--primary2:#1d4ed8;
+--success:#16a34a;
+--danger:#dc2626;
+--bg:#f1f5f9;
+--card:#ffffff;
+--border:#e2e8f0;
+--text:#0f172a;
+--muted:#64748b;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,sans-serif;
+}
+
+body{
+background:var(--bg);
+}
+
+/* MAIN */
+
+.container{
+max-width:1450px;
+margin:auto;
+}
+
+/* CARD */
+
+.card{
+
+background:#fff;
+
+border-radius:24px;
+
+padding:35px;
+
+box-shadow:
+0 15px 40px rgba(15,23,42,.08);
+
+border:1px solid rgba(226,232,240,.8);
+
+margin-bottom:35px;
+
+}
+
+/* TITLE */
+
+.card h2{
+
+font-size:30px;
+
+font-weight:700;
+
+color:var(--text);
+
+margin-bottom:30px;
+
+}
+
+/* FORM GRID */
+
+.form-grid{
+
+display:grid;
+
+grid-template-columns:
+repeat(2,1fr);
+
+gap:22px;
+
+}
+
+/* FULL WIDTH */
+
+.full-width{
+
+grid-column:1 / -1;
+
+}
+
+/* GROUP */
+
+.form-group{
+
+display:flex;
+
+flex-direction:column;
+
+}
+
+/* LABEL */
+
+.form-group label{
+
+font-size:14px;
+
+font-weight:700;
+
+color:#334155;
+
+margin-bottom:10px;
+
+}
+
+/* INPUT */
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+
+width:100%;
+
+padding:16px 18px;
+
+border-radius:16px;
+
+border:1px solid var(--border);
+
+background:#f8fafc;
+
+font-size:15px;
+
+transition:.25s ease;
+
+outline:none;
+
+}
+
+/* FOCUS */
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{
+
+border-color:var(--primary);
+
+background:white;
+
+box-shadow:
+0 0 0 4px rgba(37,99,235,.12);
+
+}
+
+/* TEXTAREA */
+
+textarea{
+
+resize:none;
+
+min-height:140px;
+
+}
+
+/* FILE BOX */
+
+.upload-box{
+
+border:2px dashed #cbd5e1;
+
+background:#f8fafc;
+
+padding:28px;
+
+border-radius:22px;
+
+text-align:center;
+
+cursor:pointer;
+
+transition:.25s;
+
+}
+
+.upload-box:hover{
+
+border-color:var(--primary);
+
+background:#eff6ff;
+
+}
+
+.upload-box input{
+
+display:none;
+
+}
+
+.upload-icon{
+
+font-size:48px;
+
+margin-bottom:10px;
+
+}
+
+.upload-text{
+
+font-weight:600;
+
+color:#475569;
+
+}
+
+/* PREVIEW */
+
+.preview-wrapper{
+
+margin-top:20px;
+
+display:flex;
+
+justify-content:center;
+
+}
+
+.preview-wrapper img{
+
+width:200px;
+
+height:150px;
+
+border-radius:18px;
+
+object-fit:cover;
+
+border:1px solid #e2e8f0;
+
+box-shadow:
+0 10px 25px rgba(0,0,0,.08);
+
+}
+
+/* CHECKBOX */
+
+.checkbox-box{
+
+display:flex;
+
+align-items:center;
+
+gap:12px;
+
+padding-top:18px;
+
+}
+
+.checkbox-box input{
+
+width:20px;
+
+height:20px;
+
+cursor:pointer;
+
+}
+
+/* BUTTON */
+
+.btn-primary{
+
+margin-top:28px;
+
+border:none;
+
+background:
+linear-gradient(
+135deg,
+#2563eb,
+#1d4ed8
+);
+
+color:white;
+
+padding:16px 28px;
+
+border-radius:18px;
+
+font-size:15px;
+
+font-weight:700;
+
+cursor:pointer;
+
+transition:.25s ease;
+
+box-shadow:
+0 10px 25px rgba(37,99,235,.25);
+
+}
+
+.btn-primary:hover{
+
+transform:translateY(-3px);
+
+box-shadow:
+0 18px 35px rgba(37,99,235,.35);
+
+}
+
+/* RESPONSIVE */
+
+@media(max-width:900px){
+
+.form-grid{
+
+grid-template-columns:1fr;
+
+}
+
+.card{
+
+padding:24px;
+
+}
+
+}
+
+</style>
+<?php
+}else{
+echo "-";
+}
+?>
 
 </td>
 
-<td><?= $row['nama_destinasi'] ?></td>
+<td>
 
-<td><?= $row['lokasi'] ?></td>
+<?= htmlspecialchars($row['name']) ?>
+
+</td>
 
 <td>
 
-Rp <?= number_format($row['harga']) ?>
+<?= htmlspecialchars($row['altitude']) ?>
+
+</td>
+
+<td>
+
+<?= htmlspecialchars($row['difficulty']) ?>
+
+</td>
+
+<td>
+
+<?= htmlspecialchars($row['duration']) ?>
+
+</td>
+
+<td>
+
+<?= htmlspecialchars($row['price']) ?>
+
+</td>
+
+<td>
+
+<?= $row['popular'] ? 'YA' : 'TIDAK' ?>
 
 </td>
 
 <td>
 
 <a
-class="edit"
-
-href="destinasi.php?edit=<?= $row['id'] ?>">
+href="?edit=<?= $row['id'] ?>"
+class="btn btn-warning">
 
 Edit
 
 </a>
 
 <a
-class="hapus"
-
-onclick="return confirm('Hapus data?')"
-
-href="destinasi.php?hapus=<?= $row['id'] ?>">
+href="?hapus=<?= $row['id'] ?>&csrf_token=<?= csrf() ?>"
+class="btn btn-delete">
 
 Hapus
 
 </a>
-
-</td>
-
-</tr>
-
-<?php
-}
-
-}else{
-?>
-
-<tr>
-
-<td
-colspan="6"
-class="empty">
-
-Belum ada data.
 
 </td>
 
@@ -628,6 +1109,37 @@ Belum ada data.
 </div>
 
 </div>
+</div>
+</div>
+<script>
+
+function previewImage(event){
+
+const file =
+event.target.files[0];
+
+if(file){
+
+const reader =
+new FileReader();
+
+reader.onload =
+function(e){
+
+document
+.getElementById('preview')
+.src =
+e.target.result;
+
+};
+
+reader.readAsDataURL(file);
+
+}
+
+}
+
+</script>
 
 </body>
 </html>

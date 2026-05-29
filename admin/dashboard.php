@@ -1,495 +1,540 @@
 <?php
 
-session_start();
-include '../config/koneksi.php';
+require_once '../config/koneksi.php';
+require_once '../config/security.php';
 
-if(!isset($_SESSION['role'])){
-header("Location: ../login.php");
-}
+requireRole('admin');
 
-if($_SESSION['role']!="admin"){
-header("Location: ../login.php");
-}
+/* =========================
+STATISTICS
+========================= */
 
-/* TOTAL DATA */
-
-$total_destinasi =
-mysqli_num_rows(
+$q_destinasi =
 mysqli_query(
+
 $koneksi,
-"SELECT * FROM destinasi"
-)
+
+"SELECT COUNT(*)
+AS total
+FROM destinasi"
+
 );
 
-$total_user =
-mysqli_num_rows(
+$total_destinasi =
+mysqli_fetch_assoc(
+$q_destinasi
+)['total'];
+
+
+
+$q_booking =
 mysqli_query(
+
 $koneksi,
-"SELECT * FROM users"
-)
+
+"SELECT COUNT(*)
+AS total
+FROM booking"
+
 );
 
 $total_booking =
-mysqli_num_rows(
+mysqli_fetch_assoc(
+$q_booking
+)['total'];
+
+
+
+$q_guide =
 mysqli_query(
+
 $koneksi,
-"SELECT * FROM booking"
-)
+
+"SELECT COUNT(*)
+AS total
+FROM users
+WHERE role='guide'"
+
 );
+
+$total_guide =
+mysqli_fetch_assoc(
+$q_guide
+)['total'];
+
+
+
+$q_customer =
+mysqli_query(
+
+$koneksi,
+
+"SELECT COUNT(*)
+AS total
+FROM users
+WHERE role='customer'"
+
+);
+
+$total_customer =
+mysqli_fetch_assoc(
+$q_customer
+)['total'];
 
 ?>
 
 <!DOCTYPE html>
-<html>
+
+<html lang="id">
 
 <head>
 
-<title>Dashboard Admin</title>
+<meta charset="UTF-8">
 
-<style>
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1.0">
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
-}
+<title>
 
-body{
-background:#eef2f7;
-display:flex;
-}
+Dashboard Admin
 
-/* SIDEBAR */
+</title>
 
-.sidebar{
-
-width:260px;
-
-height:100vh;
-
-background:#1e293b;
-
-color:white;
-
-padding:30px 20px;
-
-position:fixed;
-
-left:0;
-top:0;
-
-}
-
-.logo{
-
-font-size:24px;
-
-font-weight:bold;
-
-margin-bottom:40px;
-
-text-align:center;
-
-}
-
-.menu a{
-
-display:block;
-
-padding:15px;
-
-margin-bottom:12px;
-
-background:#334155;
-
-border-radius:12px;
-
-text-decoration:none;
-
-color:white;
-
-transition:0.3s;
-
-}
-
-.menu a:hover{
-
-background:#22c55e;
-
-transform:translateX(6px);
-
-}
-
-/* CONTENT */
-
-.content{
-
-margin-left:260px;
-
-width:100%;
-
-padding:35px;
-
-}
-
-.header{
-
-background:white;
-
-padding:25px;
-
-border-radius:18px;
-
-box-shadow:
-0 5px 20px rgba(0,0,0,0.08);
-
-margin-bottom:30px;
-
-}
-
-.header h1{
-
-color:#1e293b;
-
-margin-bottom:10px;
-
-}
-
-.header p{
-
-color:#64748b;
-
-}
-
-/* CARD */
-
-.cards{
-
-display:grid;
-
-grid-template-columns:
-repeat(auto-fit,minmax(240px,1fr));
-
-gap:25px;
-
-margin-bottom:35px;
-
-}
-
-.card{
-
-background:white;
-
-padding:30px;
-
-border-radius:18px;
-
-box-shadow:
-0 5px 20px rgba(0,0,0,0.08);
-
-transition:0.3s;
-
-}
-
-.card:hover{
-
-transform:translateY(-5px);
-
-}
-
-.card h3{
-
-color:#64748b;
-
-margin-bottom:10px;
-
-}
-
-.card h2{
-
-color:#1e293b;
-
-font-size:34px;
-
-}
-
-/* QUICK MENU */
-
-.quick{
-
-display:grid;
-
-grid-template-columns:
-repeat(auto-fit,minmax(260px,1fr));
-
-gap:25px;
-
-}
-
-.quick-card{
-
-background:white;
-
-padding:30px;
-
-border-radius:18px;
-
-box-shadow:
-0 5px 20px rgba(0,0,0,0.08);
-
-text-align:center;
-
-transition:0.3s;
-
-}
-
-.quick-card:hover{
-
-transform:translateY(-6px);
-
-}
-
-.quick-card h2{
-
-color:#1e293b;
-
-margin-bottom:15px;
-
-}
-
-.quick-card p{
-
-color:#64748b;
-
-margin-bottom:20px;
-
-}
-
-.btn{
-
-display:inline-block;
-
-background:#22c55e;
-
-color:white;
-
-padding:12px 22px;
-
-border-radius:12px;
-
-text-decoration:none;
-
-}
-
-/* MOBILE */
-
-@media(max-width:900px){
-
-body{
-display:block;
-}
-
-.sidebar{
-
-width:100%;
-
-height:auto;
-
-position:relative;
-
-}
-
-.content{
-
-margin-left:0;
-
-padding:20px;
-
-}
-
-}
-
-</style>
+<link
+rel="stylesheet"
+href="../assets/css/dashboard.css">
 
 </head>
 
 <body>
 
-<div class="sidebar">
+<?php
 
-<div class="logo">
+include 'sidebar.php';
 
-ADMIN PANEL
+?>
 
-</div>
+<div class="main-content">
 
-<div class="menu">
+    <h1>Dashboard Admin</h1>
 
-<a href="dashboard.php">
+    <!-- cards -->
+    <div class="cards">
 
-🏠 Dashboard
+        <div class="card">
+            <h3>Total Destinasi</h3>
+            <h2><?= $total_destinasi ?></h2>
+        </div>
 
-</a>
+        <div class="card">
+            <h3>Total Booking</h3>
+            <h2><?= $total_booking ?></h2>
+        </div>
 
-<a href="destinasi.php">
+        <div class="card">
+            <h3>Total Guide</h3>
+            <h2><?= $total_guide ?></h2>
+        </div>
 
-📍 Kelola Destinasi
+        <div class="card">
+            <h3>Total Customer</h3>
+            <h2><?= $total_customer ?></h2>
+        </div>
 
-</a>
-
-<a href="user.php">
-
-👤 Kelola User
-
-</a>
-
-<a href="booking.php">
-
-📑 Kelola Booking
-
-</a>
-
-<a href="../logout.php">
-
-🚪 Logout
-
-</a>
+    </div>
 
 </div>
 
-</div>
+<h1 class="page-title">
 
-<div class="content">
-
-<div class="header">
-
-<h1>
-
-Selamat Datang,
-<?= $_SESSION['username'] ?>
+Dashboard Admin
 
 </h1>
 
-<p>
-
-Dashboard Admin Sistem Booking Wisata
-
-</p>
-
-</div>
+<!-- CARDS -->
 
 <div class="cards">
 
 <div class="card">
 
-<h3>Total Destinasi</h3>
+<div class="card-title">
 
-<h2>
-
-<?= $total_destinasi ?>
-
-</h2>
+Total Destinasi
 
 </div>
+
+<div class="card-value">
+
+<?=
+
+$total_destinasi
+
+?>
+
+</div>
+
+</div>
+
+
 
 <div class="card">
 
-<h3>Total User</h3>
+<div class="card-title">
 
-<h2>
-
-<?= $total_user ?>
-
-</h2>
+Total Booking
 
 </div>
+
+<div class="card-value">
+
+<?=
+
+$total_booking
+
+?>
+
+</div>
+
+</div>
+
+
 
 <div class="card">
 
-<h3>Total Booking</h3>
+<div class="card-title">
 
-<h2>
+Total Guide
 
-<?= $total_booking ?>
+</div>
 
-</h2>
+<div class="card-value">
+
+<?=
+
+$total_guide
+
+?>
 
 </div>
 
 </div>
 
-<div class="quick">
 
-<div class="quick-card">
 
-<h2>
+<div class="card">
 
-📍 Destinasi
+<div class="card-title">
 
-</h2>
-
-<p>
-
-Kelola data tempat wisata.
-
-</p>
-
-<a
-href="destinasi.php"
-class="btn">
-
-Buka Menu
-
-</a>
+Total Customer
 
 </div>
 
-<div class="quick-card">
+<div class="card-value">
 
-<h2>
+<?=
 
-👤 User
+$total_customer
 
-</h2>
-
-<p>
-
-Kelola akun admin & konsumen.
-
-</p>
-
-<a
-href="user.php"
-class="btn">
-
-Buka Menu
-
-</a>
+?>
 
 </div>
 
-<div class="quick-card">
+</div>
+
+</div>
+
+
+
+
+
+<div class="layout-grid">
+
+<!-- LEFT CONTENT -->
+
+<div>
+
+<div class="content-card">
 
 <h2>
 
-📑 Booking
+Booking Terbaru
 
 </h2>
 
-<p>
+<div class="table-wrap">
 
-Kelola seluruh pemesanan.
+<table>
 
-</p>
+<thead>
 
-<a
-href="booking.php"
-class="btn">
+<tr>
 
-Buka Menu
+<th>ID</th>
 
-</a>
+<th>Customer</th>
+
+<th>Destinasi</th>
+
+<th>Status</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<?php
+
+$q_booking_latest =
+mysqli_query(
+
+$koneksi,
+
+"SELECT
+
+booking.id,
+
+booking.nama_customer,
+
+booking.status,
+
+destinasi.nama_destinasi
+
+FROM booking
+
+LEFT JOIN destinasi
+
+ON
+
+booking.destinasi_id
+
+=
+
+destinasi.id
+
+ORDER BY booking.id DESC
+
+LIMIT 5"
+
+);
+
+if(
+
+mysqli_num_rows(
+$q_booking_latest
+)
+>
+
+0
+
+){
+
+while(
+
+$row=
+mysqli_fetch_assoc(
+$q_booking_latest
+)
+
+){
+
+?>
+
+<tr>
+
+<td>
+
+<?=
+
+$row['id']
+
+?>
+
+</td>
+
+<td>
+
+<?=
+
+e(
+$row['nama_customer']
+)
+
+?>
+
+</td>
+
+<td>
+
+<?=
+
+e(
+$row['nama_destinasi']
+)
+
+?>
+
+</td>
+
+<td>
+
+<?=
+
+statusBadge(
+$row['status']
+)
+
+?>
+
+</td>
+
+</tr>
+
+<?php
+
+}
+
+}
+else{
+
+?>
+
+<tr>
+
+<td
+colspan="4">
+
+Belum ada booking.
+
+</td>
+
+</tr>
+
+<?php
+
+}
+
+?>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+
+
+<!-- RIGHT PANEL -->
+
+<div>
+
+<div class="right-panel">
+
+<h3>
+
+Aktivitas Cepat
+
+</h3>
+
+<ul>
+
+<li>
+
+📅
+
+Booking baru masuk
+
+</li>
+
+<li>
+
+🏔
+
+Tambah destinasi baru
+
+</li>
+
+<li>
+
+👨‍💼
+
+Kelola guide
+
+</li>
+
+<li>
+
+👥
+
+Lihat customer
+
+</li>
+
+</ul>
+
+</div>
+
+
+
+<div class="right-panel"
+style="margin-top:25px;">
+
+<h3>
+
+Admin Info
+
+</h3>
+
+<ul>
+
+<li>
+
+👤
+
+<?=
+
+e(
+$_SESSION['nama']
+)
+
+?>
+
+</li>
+
+<li>
+
+🛡
+
+Role:
+
+Admin
+
+</li>
+
+<li>
+
+🕒
+
+<?=
+
+date(
+'d M Y'
+)
+
+?>
+
+</li>
+
+</ul>
+
+</div>
 
 </div>
 
@@ -498,4 +543,5 @@ Buka Menu
 </div>
 
 </body>
+
 </html>

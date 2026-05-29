@@ -1,91 +1,223 @@
 <?php
 
-session_start();
-include 'config/koneksi.php';
-
-$error = "";
-
-if(isset($_POST['login'])){
-
-$username =
-mysqli_real_escape_string(
-$koneksi,
-$_POST['username']
-);
-
-$password = $_POST['password'];
-
-$query =
-mysqli_query(
-
-$koneksi,
-
-"SELECT * FROM users
-WHERE username='$username'"
-
-);
-
-if(mysqli_num_rows($query)>0){
-
-$data =
-mysqli_fetch_assoc($query);
+require_once 'config/koneksi.php';
+require_once 'config/security.php';
 
 if(
-password_verify(
-$password,
-$data['password']
-)
+isset($_SESSION['id'])
 ){
 
-$_SESSION['id']=$data['id'];
+switch(
+$_SESSION['role']
+){
 
-$_SESSION['nama']=$data['nama'];
+case 'admin':
 
-$_SESSION['username']=$data['username'];
-
-$_SESSION['role']=$data['role'];
-
-if($data['role']=="admin"){
-
-header(
-"Location: admin/dashboard.php"
+redirect(
+'admin/dashboard.php'
 );
 
-exit();
+break;
+
+case 'guide':
+
+redirect(
+'guide/dashboard.php'
+);
+
+break;
+
+case 'customer':
+
+redirect(
+'user/dashboard.php'
+);
+
+break;
 
 }
 
-elseif($data['role']=="guide"){
-
-header(
-"Location: guide/dashboard.php"
-);
-
-exit();
-
 }
 
-elseif($data['role']=="customer"){
+$error = '';
 
-header(
-"Location: user/dashboard.php"
+if(
+$_SERVER['REQUEST_METHOD']
+=== 'POST'
+){
+
+verifyCsrf();
+
+$username =
+e(
+$_POST['username']
+?? ''
 );
 
-exit();
+$password =
+$_POST['password']
+?? '';
 
-}
+if(
 
-}else{
+empty(
+$username
+)
+
+||
+
+empty(
+$password
+)
+
+){
 
 $error =
-"Password salah!";
+'Semua field wajib diisi.';
+
+}
+else{
+
+$stmt =
+mysqli_prepare(
+
+$koneksi,
+
+"SELECT
+id,
+nama,
+username,
+password,
+role
+
+FROM users
+
+WHERE username=?
+
+LIMIT 1"
+
+);
+
+mysqli_stmt_bind_param(
+
+$stmt,
+
+"s",
+
+$username
+
+);
+
+mysqli_stmt_execute(
+$stmt
+);
+
+$result =
+mysqli_stmt_get_result(
+$stmt
+);
+
+if(
+mysqli_num_rows(
+$result
+)>0
+){
+
+$user =
+mysqli_fetch_assoc(
+$result
+);
+
+if(
+
+password_verify(
+
+$password,
+
+$user['password']
+
+)
+
+){
+
+session_regenerate_id(
+true
+);
+
+$_SESSION['id']
+=
+$user['id'];
+
+$_SESSION['nama']
+=
+$user['nama'];
+
+$_SESSION['username']
+=
+$user['username'];
+
+$_SESSION['role']
+=
+$user['role'];
+
+$_SESSION['LAST_ACTIVITY']
+=
+time();
+
+switch(
+$user['role']
+){
+
+case 'admin':
+
+redirect(
+'admin/dashboard.php'
+);
+
+break;
+
+case 'guide':
+
+redirect(
+'guide/dashboard.php'
+);
+
+break;
+
+case 'customer':
+
+redirect(
+'user/beranda.php'
+);
+
+break;
+
+default:
+
+$error =
+'Role tidak valid.';
 
 }
 
-}else{
+}
+else{
 
 $error =
-"Username tidak ditemukan!";
+'Password salah.';
+
+}
+
+}
+else{
+
+$error =
+'Username tidak ditemukan.';
+
+}
+
+mysqli_stmt_close(
+$stmt
+);
 
 }
 
@@ -94,47 +226,166 @@ $error =
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
+
 <head>
 
-<title>Login System</title>
+<meta charset="UTF-8">
 
-<link rel="stylesheet"
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Login</title>
+
+<link
+rel="stylesheet"
 href="assets/css/style.css">
 
+<style>
+
+body{
+
+font-family:Arial,sans-serif;
+background:#eef2f7;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+height:100vh;
+
+margin:0;
+
+}
+
+.card{
+
+width:420px;
+
+background:#fff;
+
+padding:40px;
+
+border-radius:24px;
+
+box-shadow:
+0 15px 40px rgba(0,0,0,.12);
+
+}
+
+h1{
+
+text-align:center;
+
+color:#1e293b;
+
+margin-bottom:25px;
+
+}
+
+input{
+
+width:100%;
+
+padding:14px;
+
+margin-bottom:18px;
+
+border:1px solid #d1d5db;
+
+border-radius:12px;
+
+outline:none;
+
+box-sizing:border-box;
+
+}
+
+button{
+
+width:100%;
+
+padding:14px;
+
+border:none;
+
+border-radius:12px;
+
+background:#2563eb;
+
+color:white;
+
+font-size:16px;
+
+font-weight:bold;
+
+cursor:pointer;
+
+}
+
+button:hover{
+
+background:#1d4ed8;
+
+}
+
+.error{
+
+background:#fee2e2;
+
+color:#991b1b;
+
+padding:14px;
+
+border-radius:12px;
+
+margin-bottom:18px;
+
+text-align:center;
+
+}
+
+.link{
+
+margin-top:20px;
+
+text-align:center;
+
+}
+
+.link a{
+
+text-decoration:none;
+
+color:#2563eb;
+
+font-weight:bold;
+
+}
+
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
-<body class="login-body">
+<body>
 
-<div class="login-container">
-
-<div class="login-card">
+<div class="card">
 
 <h1>
 
-LOGIN SISTEM
+LOGIN SYSTEM
 
 </h1>
 
-<p>
-
-Admin • Guide • Customer
-
-</p>
-
-<?php
-if($error!=""){
-?>
-
-<div class="alert-danger">
-
-<?= $error ?>
-
-</div>
-
-<?php } ?>
-
 <form method="POST">
+
+<input
+type="hidden"
+name="csrf_token"
+value="<?= csrf() ?>">
 
 <input
 type="text"
@@ -155,8 +406,7 @@ placeholder="Password"
 required>
 
 <button
-type="submit"
-name="login">
+type="submit">
 
 LOGIN
 
@@ -164,9 +414,9 @@ LOGIN
 
 </form>
 
-<div class="register-link">
+<div class="link">
 
-Customer belum punya akun?
+Belum punya akun?
 
 <a href="register.php">
 
@@ -178,7 +428,25 @@ Daftar
 
 </div>
 
-</div>
+<?php if($error!=''){ ?>
+
+<script>
+
+Swal.fire({
+
+icon:'error',
+
+title:'Login Gagal',
+
+text:'<?= e($error) ?>',
+
+confirmButtonColor:'#ef4444'
+
+});
+
+</script>
+
+<?php } ?>
 
 </body>
 </html>

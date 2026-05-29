@@ -457,3 +457,50 @@ overflow-x:auto;
 }
 
 }
+table{
+width:100%;
+border-collapse:collapse;
+background:white;
+border-radius:20px;
+overflow:hidden;
+box-shadow:0 10px 25px rgba(0,0,0,.06);
+}
+
+th{
+background:#0f172a;
+color:white;
+padding:16px;
+}
+
+td{
+padding:15px;
+border-bottom:1px solid #e5e7eb;
+}
+
+tr:hover{
+background:#f8fafc;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:white;
+border-radius:20px;
+overflow:hidden;
+box-shadow:0 10px 25px rgba(0,0,0,.06);
+}
+
+th{
+background:#0f172a;
+color:white;
+padding:16px;
+}
+
+td{
+padding:15px;
+border-bottom:1px solid #e5e7eb;
+}
+
+tr:hover{
+background:#f8fafc;
+}
