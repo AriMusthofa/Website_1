@@ -1337,7 +1337,7 @@ $filtered = array_filter($pakets, function ($p) use ($active_filter) {
                     </div>
 
                     <div class="card-footer" onclick="event.stopPropagation()">
-                        <a href="../user/booking.php?destinasi=<?= urlencode($p['id']) ?>"
+                        <a href="../user/booking.php?dest=<?= $p['id'] ?>"
                             class="btn-book-now">
                             Booking Sekarang
                         </a>
@@ -1357,20 +1357,6 @@ $filtered = array_filter($pakets, function ($p) use ($active_filter) {
                     <p>Coba filter lain atau reset pencarian</p>
                     <a href="paket-pendakian.php">Tampilkan Semua</a>
                 </div>
-            <?php endif; ?>
-
-            <!-- "Lihat Semua" card selalu tampil saat ada hasil -->
-            <?php if (count($filtered) > 0): ?>
-                <a href="paket-pendakian.php" class="see-all-card">
-                    <div class="see-all-label">Lihat Semua Destinasi</div>
-                    <div class="see-all-sub">Lihat semua destinasi pendakian lainnya</div>
-                    <div class="see-all-arrow">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
-                            <line x1="5" y1="12" x2="19" y2="12" />
-                            <polyline points="12 5 19 12 12 19" />
-                        </svg>
-                    </div>
-                </a>
             <?php endif; ?>
         </div>
 

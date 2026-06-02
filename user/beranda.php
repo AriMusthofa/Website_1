@@ -9,7 +9,7 @@ $destinations = [
         "difficulty_class" => "sulit",
         "duration" => "2 - 3 Hari",
         "price" => "Mulai Rp 300.000",
-        "image" => "6a193065f14f2_destinasi",
+        "image" => "../upload/6a193065f14f2_destinasi.png",
     ],
     [
         "name" => "Bukit Pergasingan",
@@ -18,7 +18,7 @@ $destinations = [
         "difficulty_class" => "mudah",
         "duration" => "2 - 4 Jam",
         "price" => "Mulai Rp 100.000",
-        "image" => "../upload/6a1bab4cbe9b2_destinasi",
+        "image" => "../upload/6a1bab4cbe9b2_destinasi.jpg",
     ],
     [
         "name" => "Bukit Sempana",
@@ -27,7 +27,7 @@ $destinations = [
         "difficulty_class" => "menengah",
         "duration" => "4 - 7 Jam",
         "price" => "Mulai Rp 100.000",
-        "image" => "../upload/6a192d57899da_destinasi",
+        "image" => "../upload/6a192d57899da_destinasi.jpg",
     ],
     [
         "name" => "Bukit Anak Dara",
@@ -36,7 +36,7 @@ $destinations = [
         "difficulty_class" => "mudah",
         "duration" => "4 - 6 Jam",
         "price" => "Mulai Rp 100.000",
-        "image" => "../upload/6a1bab3bc6ee4_destinasi",
+        "image" => "../upload/6a1bab3bc6ee4_destinasi.jpg",
     ],
 ];
 
@@ -1031,22 +1031,22 @@ $why_us = [
             </div>
             <p>Guide lokal terpercaya untuk pendakian aman dan berkesan di kawasan Sembalun, Lombok.</p>
             <div class="footer-social">
-                <a href="#" class="social-btn" title="Instagram">
+                <a href="https://www.instagram.com/btn_gn_rinjani?igsh=cW1nMWkzc3Zxa2Qw" class="social-btn" title="Instagram">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
                     </svg>
                 </a>
-                <a href="#" class="social-btn" title="Facebook">
+                <a href="https://www.facebook.com/share/1Awdjmqzyv/" class="social-btn" title="Facebook">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
                     </svg>
                 </a>
-                <a href="https://wa.me/6281234567890" class="social-btn" title="WhatsApp">
+                <a href="https://wa.me/6283129650994" class="social-btn" title="WhatsApp">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/>
                     </svg>
                 </a>
-                <a href="#" class="social-btn" title="YouTube">
+                <a href="https://youtube.com/@tamannasionalgunungrinjani?si=7Xywnoc5REQnpFOE" class="social-btn" title="YouTube">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 001.46 6.42 29 29 0 001 12a29 29 0 00.46 5.58 2.78 2.78 0 001.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.96A29 29 0 0023 12a29 29 0 00-.46-5.58z"/>
                         <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/>
@@ -1073,7 +1073,7 @@ $why_us = [
                 <?php foreach ($destinations as $d): ?>
                 <li><a href="#"><?= htmlspecialchars($d['name']) ?></a></li>
                 <?php endforeach; ?>
-                <li><a href="tentang.php">Semua Destinasi →</a></li>
+                <li><a href="paket.php">Semua Destinasi →</a></li>
             </ul>
         </div>
 

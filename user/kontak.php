@@ -10,8 +10,8 @@ $contacts = [
         "type"    => "phone",
         "title"   => "Telepon",
         "desc"    => "Hubungi kami melalui telepon",
-        "value"   => "+62 812-3456-7890",
-        "href"    => "tel:+6281234567890",
+        "value"   => "+62 831-2965-0994",
+        "href"    => "tel:+6283129650994",
         "color"   => "#25a85a",
         "bg"      => "#e8f8f0",
     ],
@@ -19,8 +19,8 @@ $contacts = [
         "type"    => "whatsapp",
         "title"   => "WhatsApp",
         "desc"    => "Chat kami langsung di WhatsApp",
-        "value"   => "+62 812-3456-7890",
-        "href"    => "https://wa.me/6281234567890?text=Halo%2C+saya+ingin+bertanya+tentang+pendakian",
+        "value"   => "+62 831-2965-0994",
+        "href"    => "https://wa.me/qr/OBEVYAVI5YMFM1",
         "color"   => "#25d366",
         "bg"      => "#e8faf0",
     ],
@@ -29,7 +29,7 @@ $contacts = [
         "title"   => "Instagram",
         "desc"    => "Follow kami di Instagram",
         "value"   => "@rinjaniguide",
-        "href"    => "https://instagram.com/rinjaniguide",
+        "href"    => "https://www.instagram.com/btn_gn_rinjani?igsh=cW1nMWkzc3Zxa2Qw",
         "color"   => "#e1306c",
         "bg"      => "#fce8f0",
     ],
@@ -38,7 +38,7 @@ $contacts = [
         "title"   => "Facebook",
         "desc"    => "Like & follow halaman kami",
         "value"   => "Rinjani Guide",
-        "href"    => "https://facebook.com/rinjaniguide",
+        "href"    => "https://www.facebook.com/share/1Awdjmqzyv/",
         "color"   => "#1877f2",
         "bg"      => "#e8f0fe",
     ],
@@ -47,7 +47,7 @@ $contacts = [
         "title"   => "TikTok",
         "desc"    => "Tonton konten kami di TikTok",
         "value"   => "@rinjaniguide",
-        "href"    => "https://tiktok.com/@rinjaniguide",
+        "href"    => "https://www.tiktok.com/@btn_gn_rinjani?_r=1&_t=ZS-96rwnoZfONx",
         "color"   => "#010101",
         "bg"      => "#f0f0f0",
     ],
@@ -915,7 +915,7 @@ $csrf = $_SESSION['csrf'];
                 <p>Tim kami siap membantu 24/7 untuk semua kebutuhan pendakian Anda.</p>
             </div>
         </div>
-        <a href="https://wa.me/6283129650994?text=Halo%2C+saya+butuh+bantuan+tentang+pendakian"
+        <a href="https://wa.me/qr/OBEVYAVI5YMFM1"
            target="_blank" rel="noopener" class="btn-wa">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
@@ -949,10 +949,10 @@ $csrf = $_SESSION['csrf'];
         <div>
             <div class="footer-h">Sosial Media</div>
             <ul class="footer-links">
-                <li><a href="https://wa.me/6283129650994" target="_blank">WhatsApp</a></li>
-                <li><a href="https://instagram.com/rinjaniguide" target="_blank">Instagram</a></li>
-                <li><a href="https://facebook.com/rinjaniguide" target="_blank">Facebook</a></li>
-                <li><a href="https://tiktok.com/@rinjaniguide" target="_blank">TikTok</a></li>
+                <li><a href="https://wa.me/qr/OBEVYAVI5YMFM1" target="_blank">WhatsApp</a></li>
+                <li><a href="https://www.instagram.com/btn_gn_rinjani?igsh=cW1nMWkzc3Zxa2Qw" target="_blank">Instagram</a></li>
+                <li><a href="https://www.facebook.com/share/1Awdjmqzyv/" target="_blank">Facebook</a></li>
+                <li><a href="https://www.tiktok.com/@btn_gn_rinjani?_r=1&_t=ZS-96rwnoZfONx" target="_blank">TikTok</a></li>
             </ul>
         </div>
     </div>

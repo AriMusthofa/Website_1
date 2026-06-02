@@ -18,7 +18,7 @@ ASSIGN GUIDE
 
 if(isset($_POST['assign'])){
 
-$booking_id = intval($_POST['user_id'] ?? 0);
+$booking_id = intval($_POST['booking_id'] ?? 0);
 $guide_id   = intval($_POST['guide_id']);
 
 $cekguide = mysqli_query(

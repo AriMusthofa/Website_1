@@ -142,6 +142,21 @@ $q_notif = mysqli_query($koneksi,
      WHERE guide_id = '$guide_id' AND status = 'Menunggu Guide'"
 );
 $notif_count = mysqli_fetch_assoc($q_notif)['total'] ?? 0;
+
+$q_booking = mysqli_query(
+    $koneksi,
+    "SELECT
+        booking.*,
+        users.nama AS customer_nama,
+        destinasi.name AS destinasi_nama
+    FROM booking
+    LEFT JOIN users
+        ON booking.user_id = users.id
+    LEFT JOIN destinasi
+        ON booking.destinasi_id = destinasi.id
+    WHERE booking.guide_id='$guide_id'
+    ORDER BY booking.id DESC"
+);
 ?>
 <!DOCTYPE html>
 <html lang="id">

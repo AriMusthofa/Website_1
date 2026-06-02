@@ -62,10 +62,10 @@ $why_us = [
 ];
 
 $team = [
-    ["name" => "Sulaiman",    "role" => "Lead Guide & Founder",      "exp" => "5 tahun pengalaman", "img" => "images/team-1.jpg"],
-    ["name" => "Putra Jaya",   "role" => "Operations Manager",        "exp" => "3 tahun pengalaman",  "img" => "images/team-2.jpg"],
-    ["name" => "Zahid Faruqi",    "role" => "Senior Mountain Guide",     "exp" => "2 tahun pengalaman", "img" => "images/team-3.jpg"],
-    ["name" => "Ari Musthofa", "role" => "Safety & Equipment Officer","exp" => "2 tahun pengalaman",  "img" => "images/team-4.jpg"],
+    ["name" => "Sulaiman",    "role" => "Lead Guide & Founder",      "exp" => "5 tahun pengalaman", "img" => "../upload/Sulaiman.jpg"],
+    ["name" => "Putra Jaya",   "role" => "Operations Manager",        "exp" => "3 tahun pengalaman",  "img" => "../upload/Putra.jpg"],
+    ["name" => "Zahid Faruqi",    "role" => "Senior Mountain Guide",     "exp" => "2 tahun pengalaman", "img" => "../upload/Faruq.jpg"],
+    ["name" => "Ari Musthofa", "role" => "Safety & Equipment Officer","exp" => "2 tahun pengalaman",  "img" => "../upload/Ari.jpg"],
 ];
 ?>
 <!DOCTYPE html>
