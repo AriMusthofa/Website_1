@@ -1,1060 +1,822 @@
 <?php
+session_start();
+include '../config/koneksi.php';
 
-require_once '../config/koneksi.php';
-require_once '../config/security.php';
+// ── Auth: hanya guide yang boleh masuk ──────────────────────────────────────
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'guide') {
+    header("Location: ../login.php");
+    exit();
+}
 
-requireRole('guide');
+$guide_id   = intval($_SESSION['id']);
+$guide_name = htmlspecialchars($_SESSION['nama'] ?? 'Guide');
 
-$id_guide = $_SESSION['id'];
-
-/* =========================
-TOTAL BOOKING
-========================= */
-
+// ── Statistik booking milik guide ini ───────────────────────────────────────
 $q_total = mysqli_query(
-
-$koneksi,
-
-"SELECT COUNT(*) AS total
-FROM booking
-WHERE guide_id='$id_guide'"
-
+    $koneksi,
+    "SELECT COUNT(*) AS total
+     FROM booking
+     WHERE guide_id = '$guide_id'"
 );
+$total = mysqli_fetch_assoc($q_total)['total'] ?? 0;
 
-$total_booking =
-mysqli_fetch_assoc($q_total)['total'];
-
-/* =========================
-PENDING
-========================= */
-
-$q_pending = mysqli_query(
-
-$koneksi,
-
-"SELECT COUNT(*) AS total
-FROM booking
-WHERE guide_id='$id_guide'
-AND status='Menunggu Guide'"
-
+$q_tunggu = mysqli_query(
+    $koneksi,
+    "SELECT COUNT(*) AS total
+     FROM booking
+     WHERE guide_id = '$guide_id'
+     AND status = 'Menunggu Guide'"
 );
+$menunggu = mysqli_fetch_assoc($q_tunggu)['total'] ?? 0;
 
-$total_pending =
-mysqli_fetch_assoc($q_pending)['total'];
-
-/* =========================
-DITERIMA
-========================= */
-
-$q_diterima = mysqli_query(
-
-$koneksi,
-
-"SELECT COUNT(*) AS total
-FROM booking
-WHERE guide_id='$id_guide'
-AND status='Diterima Guide'"
-
+$q_terima = mysqli_query(
+    $koneksi,
+    "SELECT COUNT(*) AS total
+     FROM booking
+     WHERE guide_id = '$guide_id'
+     AND status = 'Diterima Guide'"
 );
+$diterima = mysqli_fetch_assoc($q_terima)['total'] ?? 0;
 
-$total_diterima =
-mysqli_fetch_assoc($q_diterima)['total'];
-
+// ── 5 Booking terbaru ───────────────────────────────────────────────────────
+$q_booking = mysqli_query(
+    $koneksi,
+    "SELECT
+        booking.id,
+        users.nama AS customer_nama,
+        destinasi.name AS destinasi_nama,
+        booking.status
+     FROM booking
+     LEFT JOIN users
+        ON booking.user_id = users.id
+     LEFT JOIN destinasi
+        ON booking.destinasi_id = destinasi.id
+     WHERE booking.guide_id = '$guide_id'
+     ORDER BY booking.id DESC
+     LIMIT 5"
+);
 ?>
 
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1.0">
+<title>Dashboard Guide – Explore Tour</title>
 
-<title>
-
-Dashboard Guide
-
-</title>
-
-<link
-rel="stylesheet"
-href="../assets/css/dashboard.css">
-
-<link
-rel="stylesheet"
-
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-
-/* =========================
-PAGE HEADER
-========================= */
-
-.page-subtitle{
-
-color:#64748b;
-
-margin-top:6px;
-
-font-size:16px;
-
+*,
+*::before,
+*::after{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
 }
 
-/* =========================
-CARD ICON
-========================= */
+:root{
+    --navy:#0d1b2e;
+    --blue:#2563eb;
+    --blue-light:#eff6ff;
+    --green:#16a34a;
+    --green-bg:#f0fdf4;
+    --green-text:#15803d;
+    --orange:#ea580c;
+    --orange-bg:#fff7ed;
+    --orange-text:#c2410c;
+    --red:#dc2626;
+    --yellow-bg:#fef3c7;
+    --yellow-text:#92400e;
+    --bg:#f1f5f9;
+    --card:#ffffff;
+    --text:#1e293b;
+    --muted:#64748b;
+    --border:#e2e8f0;
+    --sidebar-w:230px;
+    --radius:14px;
+}
+
+/* BODY */
+html,
+body{
+    width:100%;
+    overflow-x:hidden;
+}
+
+body{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    display:flex;
+    min-height:100vh;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:var(--sidebar-w);
+    height:100vh;
+    background:var(--navy);
+    display:flex;
+    flex-direction:column;
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:100;
+    overflow-y:auto;
+    transition:transform .3s;
+}
+
+.sidebar-brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:28px 20px 24px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.brand-icon{
+    width:44px;
+    height:44px;
+    background:rgba(255,255,255,.1);
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    flex-shrink:0;
+}
+
+.brand-icon svg{
+    width:24px;
+    height:24px;
+}
+
+.brand-name{
+    font-size:14px;
+    font-weight:800;
+    color:#fff;
+    text-transform:uppercase;
+    line-height:1.1;
+}
+
+.brand-sub{
+    font-size:11px;
+    color:rgba(255,255,255,.45);
+    font-weight:500;
+    margin-top:2px;
+}
+
+.sidebar-nav{
+    flex:1;
+    padding:20px 12px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+
+.nav-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:11px 14px;
+    border-radius:10px;
+    color:rgba(255,255,255,.55);
+    font-size:14px;
+    font-weight:500;
+    text-decoration:none;
+    transition:.2s;
+}
+
+.nav-item i{
+    width:20px;
+    text-align:center;
+}
+
+.nav-item:hover{
+    background:rgba(255,255,255,.07);
+    color:#fff;
+}
+
+.nav-item.active{
+    background:var(--blue);
+    color:#fff;
+    box-shadow:0 4px 14px rgba(37,99,235,.4);
+}
+
+.sidebar-footer{
+    padding:16px 12px 24px;
+    border-top:1px solid rgba(255,255,255,.08);
+}
+
+.logout-btn{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 14px;
+    border-radius:10px;
+    color:#f87171;
+    text-decoration:none;
+    font-weight:600;
+}
+
+.logout-btn:hover{
+    background:rgba(248,113,113,.1);
+}
+
+/* MAIN */
+.main{
+    margin-left:var(--sidebar-w);
+    width:calc(100vw - var(--sidebar-w));
+    max-width:calc(100vw - var(--sidebar-w));
+    padding:36px 24px;
+    overflow-x:hidden;
+}
+
+.page-title{
+    font-size:30px;
+    font-weight:800;
+}
+
+.page-welcome{
+    font-size:14px;
+    color:var(--muted);
+    margin-top:5px;
+}
+
+.page-welcome b{
+    color:var(--text);
+}
+
+/* STAT */
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+    margin:24px 0;
+}
+
+.stat-card{
+    background:var(--card);
+    border-radius:var(--radius);
+    padding:24px 22px;
+    display:flex;
+    align-items:center;
+    gap:18px;
+    box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
 
 .stat-icon{
-
-font-size:32px;
-
-margin-bottom:18px;
-
-color:#2563eb;
-
+    width:52px;
+    height:52px;
+    border-radius:14px;
+    display:grid;
+    place-items:center;
+    font-size:22px;
+    flex-shrink:0;
 }
 
-/* =========================
-GRID CONTENT
-========================= */
-
-.dashboard-grid{
-
-display:grid;
-
-grid-template-columns:
-2fr 1fr;
-
-gap:28px;
-
+.stat-icon.blue{
+    background:var(--blue-light);
+    color:var(--blue);
 }
 
-/* =========================
-RIGHT CARD
-========================= */
-
-.side-card{
-
-background:#ffffff;
-
-padding:28px;
-
-border-radius:24px;
-
-box-shadow:
-0 10px 30px rgba(0,0,0,.07);
-
-margin-bottom:24px;
-
+.stat-icon.orange{
+    background:var(--orange-bg);
+    color:var(--orange);
 }
 
-.side-card h3{
-
-margin-bottom:18px;
-
-color:#0f172a;
-
+.stat-icon.green{
+    background:var(--green-bg);
+    color:var(--green);
 }
 
-/* =========================
-ACTIVITY
-========================= */
-
-.activity-item{
-
-padding:14px 0;
-
-border-bottom:
-1px solid #e5e7eb;
-
-color:#475569;
-
+.stat-label{
+    font-size:13px;
+    color:var(--muted);
 }
 
-.activity-item:last-child{
-
-border-bottom:none;
-
+.stat-value{
+    font-size:34px;
+    font-weight:800;
 }
 
-/* =========================
-QUICK MENU
-========================= */
+.stat-value.blue{
+    color:var(--blue);
+}
 
+.stat-value.orange{
+    color:var(--orange);
+}
+
+.stat-value.green{
+    color:var(--green);
+}
+
+/* BOTTOM GRID */
+.bottom-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 300px;
+    gap:20px;
+    width:100%;
+}
+
+.card{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:0 1px 4px rgba(0,0,0,.06);
+    overflow:hidden;
+}
+
+.card-header{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:20px 22px 16px;
+    border-bottom:1px solid var(--border);
+}
+
+.card-header i{
+    color:var(--blue);
+    font-size:18px;
+}
+
+.card-header h2{
+    font-size:17px;
+    font-weight:700;
+}
+
+/* TABLE */
+.table-responsive{
+    width:100%;
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+thead tr{
+    background:var(--navy);
+    color:#fff;
+}
+
+thead th{
+    padding:12px 18px;
+    font-size:13px;
+    font-weight:600;
+    text-align:left;
+    white-space:nowrap;
+}
+
+tbody tr{
+    border-bottom:1px solid var(--border);
+    transition:.15s;
+}
+
+tbody tr:last-child{
+    border-bottom:none;
+}
+
+tbody tr:hover{
+    background:#f8fafc;
+}
+
+tbody td{
+    padding:14px 18px;
+    font-size:14px;
+    font-weight:500;
+    white-space:nowrap;
+}
+
+/* BADGE */
+.badge{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:4px 12px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.badge-green{
+    background:var(--green-bg);
+    color:var(--green-text);
+    border:1px solid #bbf7d0;
+}
+
+.badge-orange{
+    background:var(--orange-bg);
+    color:var(--orange-text);
+    border:1px solid #fed7aa;
+}
+
+.badge-blue{
+    background:var(--blue-light);
+    color:#1d4ed8;
+    border:1px solid #bfdbfe;
+}
+
+.badge-red{
+    background:#fee2e2;
+    color:#991b1b;
+    border:1px solid #fecaca;
+}
+
+.badge-yellow{
+    background:var(--yellow-bg);
+    color:var(--yellow-text);
+    border:1px solid #fde68a;
+}
+
+/* FOOTER */
+.card-footer{
+    padding:14px 22px;
+    border-top:1px solid var(--border);
+    text-align:center;
+}
+
+.card-footer a{
+    color:var(--blue);
+    text-decoration:none;
+    font-size:13px;
+    font-weight:600;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+}
+
+.card-footer a:hover{
+    gap:10px;
+}
+
+/* QUICK MENU */
 .quick-menu{
+    background:var(--card);
+    border-radius:var(--radius);
+    padding:22px;
+    box-shadow:0 1px 4px rgba(0,0,0,.06);
+    height:max-content;
+}
 
-display:flex;
+.qm-header{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:18px;
+}
 
-flex-direction:column;
+.qm-header i{
+    color:#eab308;
+    font-size:18px;
+}
 
-gap:14px;
+.qm-header h2{
+    font-size:17px;
+    font-weight:700;
+}
+
+.quick-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    font-family:inherit;
+    font-size:15px;
+    font-weight:700;
+    text-decoration:none;
+    margin-bottom:12px;
+    transition:.2s;
+}
+
+.quick-btn:last-child{
+    margin-bottom:0;
+}
+
+.quick-btn.green{
+    background:var(--green);
+    color:#fff;
+}
+
+.quick-btn.red{
+    background:var(--red);
+    color:#fff;
+}
+
+.quick-btn:hover{
+    transform:translateY(-2px);
+}
+
+/* NOTIFICATION */
+.notif-badge{
+    background:var(--red);
+    color:#fff;
+    border-radius:999px;
+    font-size:10px;
+    font-weight:700;
+    padding:1px 6px;
+    margin-left:auto;
+}
+
+/* MOBILE BUTTON */
+.menu-toggle{
+    display:none;
+    position:fixed;
+    top:16px;
+    left:16px;
+    z-index:200;
+    background:var(--navy);
+    color:#fff;
+    border:none;
+    width:42px;
+    height:42px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:18px;
+}
+
+.overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.4);
+    z-index:99;
+}
+
+/* ANIMATION */
+@keyframes fadeUp{
+    from{
+        opacity:0;
+        transform:translateY(16px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+/* RESPONSIVE */
+@media(max-width:1100px){
+
+    .bottom-grid{
+        grid-template-columns:1fr;
+    }
 
 }
 
-.quick-menu a{
+@media(max-width:900px){
 
-display:flex;
-
-align-items:center;
-
-gap:12px;
-
-padding:14px 18px;
-
-border-radius:14px;
-
-text-decoration:none;
-
-background:#f8fafc;
-
-color:#0f172a;
-
-font-weight:600;
-
-transition:.25s;
+    .stats-grid{
+        grid-template-columns:1fr 1fr;
+    }
 
 }
 
-.quick-menu a:hover{
+@media(max-width:768px){
 
-background:#2563eb;
+    .sidebar{
+        transform:translateX(-100%);
+    }
 
-color:white;
+    .sidebar.open{
+        transform:translateX(0);
+    }
 
-}
+    .overlay.open{
+        display:block;
+    }
 
-/* =========================
-STATUS BADGE WRAPPER
-========================= */
+    .menu-toggle{
+        display:grid;
+        place-items:center;
+    }
 
-.status-wrap{
+    .main{
+        width:100%;
+        max-width:100%;
+        margin-left:0;
+        padding:20px 15px 30px;
+        padding-top:70px;
+    }
 
-display:inline-block;
+    .stats-grid{
+        grid-template-columns:1fr;
+        gap:14px;
+    }
 
-}
-
-/* =========================
-RESPONSIVE
-========================= */
-
-@media(max-width:991px){
-
-.dashboard-grid{
-
-grid-template-columns:1fr;
-
-}
-
+    .bottom-grid{
+        grid-template-columns:1fr;
+    }
 }
 
 </style>
-
 </head>
-
 <body>
 
-<div class="layout">
+<button class="menu-toggle" id="menuToggle">
+    <i class="fas fa-bars"></i>
+</button>
 
-<!-- SIDEBAR -->
+<div class="overlay" id="overlay"></div>
 
-<div class="sidebar">
+<?php include 'sidebar.php'; ?>
 
-<div class="sidebar-logo">
+<main class="main">
 
-GUIDE PANEL
+<div class="page-header">
+    <h1 class="page-title">Dashboard Guide</h1>
+    <p class="page-welcome">
+        Selamat datang, <b><?= $guide_name ?></b>
+    </p>
+</div>
+
+<!-- STAT CARDS -->
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <div class="stat-icon blue">
+            <i class="fas fa-clipboard-list"></i>
+        </div>
+        <div>
+            <div class="stat-label">Total Booking</div>
+            <div class="stat-value blue">
+                <?= $total ?>
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon orange">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div>
+            <div class="stat-label">Menunggu Konfirmasi</div>
+            <div class="stat-value orange">
+                <?= $menunggu ?>
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon green">
+            <i class="fas fa-circle-check"></i>
+        </div>
+        <div>
+            <div class="stat-label">Booking Diterima</div>
+            <div class="stat-value green">
+                <?= $diterima ?>
+            </div>
+        </div>
+    </div>
 
 </div>
 
-<ul class="sidebar-menu">
+<!-- CONTENT -->
+<div class="bottom-grid">
 
-<li>
+    <!-- BOOKING TERBARU -->
+    <div class="card">
 
-<a
-href="dashboard.php"
-class="active">
+        <div class="card-header">
+            <i class="fas fa-clipboard-list"></i>
+            <h2>Booking Terbaru</h2>
+        </div>
 
-<span>
+        <div class="table-responsive">
 
-<i class="fa-solid fa-chart-line"></i>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer</th>
+                        <th>Destinasi</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
 
-Dashboard
+                <tbody>
 
-</span>
+                <?php if(mysqli_num_rows($q_booking) > 0): ?>
 
-</a>
+                    <?php while($row = mysqli_fetch_assoc($q_booking)): ?>
 
-</li>
+                    <tr>
+                        <td>#<?= $row['id']; ?></td>
 
-<li>
+                        <td>
+                            <?= htmlspecialchars($row['customer_nama'] ?? '-') ?>
+                        </td>
 
-<a href="booking.php">
+                        <td>
+                            <?= htmlspecialchars($row['destinasi_nama'] ?? '-') ?>
+                        </td>
 
-<span>
+                        <td>
 
-<i class="fa-solid fa-calendar-check"></i>
+                            <?php
 
-Booking
+                            $s = $row['status'];
 
-</span>
+                            $cls = match($s){
+                                'Diterima Guide'   => 'badge-green',
+                                'Menunggu Guide'   => 'badge-orange',
+                                'Guide Ditugaskan' => 'badge-blue',
+                                'Guide Menolak'    => 'badge-red',
+                                default            => 'badge-yellow'
+                            };
 
-<span class="badge">
+                            ?>
 
-<?= $total_pending ?>
+                            <span class="badge <?= $cls ?>">
+                                <?= htmlspecialchars($s) ?>
+                            </span>
 
-</span>
+                        </td>
+                    </tr>
 
-</a>
+                    <?php endwhile; ?>
 
-</li>
+                <?php else: ?>
 
-</ul>
+                    <tr>
+                        <td colspan="4"
+                            style="padding:30px;text-align:center;color:var(--muted)">
+                            Belum ada booking.
+                        </td>
+                    </tr>
 
-<div class="sidebar-footer">
+                <?php endif; ?>
 
-<a
-href="../logout.php"
-class="logout-btn">
+                </tbody>
+            </table>
 
-Logout
+        </div>
 
-</a>
+        <div class="card-footer">
+            <a href="booking.php">
+                <i class="fas fa-calendar-check"></i>
+                Lihat semua booking
+                <i class="fas fa-arrow-right" style="font-size:11px"></i>
+            </a>
+        </div>
 
-</div>
+    </div>
 
-</div>
+    <!-- QUICK MENU -->
+    <div class="quick-menu">
 
-<!-- MAIN CONTENT -->
+        <div class="qm-header">
+            <i class="fas fa-bolt"></i>
+            <h2>Quick Menu</h2>
+        </div>
 
-<div class="main-content">
+        <a href="booking.php" class="quick-btn green">
+            <i class="fas fa-calendar-check"></i>
+            Kelola Booking
+        </a>
 
-<h1 class="page-title">
+        <a href="../logout.php" class="quick-btn red">
+            <i class="fas fa-right-from-bracket"></i>
+            Logout
+        </a>
 
-Dashboard Guide
-
-</h1>
-
-<div class="page-subtitle">
-
-Selamat datang,
-
-<b><?= e($_SESSION['nama']) ?></b>
-
-</div>
-
-<!-- CARD STATS -->
-
-<div class="cards">
-
-<div class="card">
-
-<div class="stat-icon">
-
-<i class="fa-solid fa-book"></i>
-
-</div>
-
-<div class="card-title">
-
-Total Booking
-
-</div>
-
-<div class="card-value">
-
-<?= $total_booking ?>
-
-</div>
-
-</div>
-
-<div class="card">
-
-<div class="stat-icon">
-
-<i class="fa-solid fa-clock"></i>
-
-</div>
-
-<div class="card-title">
-
-Menunggu Konfirmasi
+    </div>
 
 </div>
 
-<div class="card-value">
+</main>
 
-<?= $total_pending ?>
+<script>
 
-</div>
+const toggle  = document.getElementById('menuToggle');
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
 
-</div>
+if(toggle && sidebar && overlay){
 
-<div class="card">
+    toggle.addEventListener('click', () => {
 
-<div class="stat-icon">
+        sidebar.classList.add('open');
+        overlay.classList.add('open');
 
-<i class="fa-solid fa-circle-check"></i>
+    });
 
-</div>
+    overlay.addEventListener('click', () => {
 
-<div class="card-title">
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
 
-Booking Diterima
-
-</div>
-
-<div class="card-value">
-
-<?= $total_diterima ?>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="dashboard-grid">
-
-<!-- LEFT -->
-
-<div class="content-card">
-
-<h2>
-
-Booking Terbaru
-
-</h2>
-
-<div class="table-wrap">
-
-<table>
-
-<thead>
-
-<tr>
-
-<th>ID</th>
-
-<th>Customer</th>
-
-<th>Status</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-<?php
-
-$q_booking =
-mysqli_query(
-
-$koneksi,
-
-"SELECT *
-FROM booking
-WHERE guide_id='$id_guide'
-ORDER BY id DESC
-LIMIT 5"
-
-);
-
-if(
-mysqli_num_rows($q_booking)>0
-){
-
-while(
-$row=
-mysqli_fetch_assoc($q_booking)
-){
-
-?>
-
-<tr>
-
-<td>
-
-#<?= $row['id'] ?>
-
-</td>
-
-<td>
-
-<?= e(
-$row['nama_customer']
-?? '-'
-) ?>
-
-</td>
-
-<td>
-
-<div class="status-wrap">
-
-<?= statusBadge(
-$row['status']
-) ?>
-
-</div>
-
-</td>
-
-</tr>
-
-<?php
+    });
 
 }
 
-}else{
-
-?>
-
-<tr>
-
-<td
-colspan="3"
-
-style="
-text-align:center;
-padding:30px;
-">
-
-Belum ada booking.
-
-</td>
-
-</tr>
-
-<?php
-
-}
-
-?>
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-<!-- RIGHT PANEL -->
-
-<div>
-
-<div class="side-card">
-
-<h3>
-
-Aktivitas Guide
-
-</h3>
-
-<div class="activity-item">
-
-📌 Booking baru masuk
-
-</div>
-
-<div class="activity-item">
-
-📌 Cek booking pending
-
-</div>
-
-<div class="activity-item">
-
-📌 Update status booking
-
-</div>
-
-</div>
-
-<div class="side-card">
-
-<h3>
-
-Quick Menu
-
-</h3>
-
-<div class="quick-menu">
-
-<a href="booking.php">
-
-<i class="fa-solid fa-calendar-check"></i>
-
-Kelola Booking
-
-</a>
-
-<a href="../logout.php">
-
-<i class="fa-solid fa-right-from-bracket"></i>
-
-Logout
-
-</a>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
+</script>
 
 </body>
-
-</html>
-
-td{
-
-padding:16px;
-
-border-bottom:
-1px solid #e5e7eb;
-
-}
-
-tr:hover{
-
-background:#f8fafc;
-
-}
-
-.activity .item{
-
-padding:14px 0;
-
-border-bottom:
-1px solid #e5e7eb;
-
-}
-
-.quick-menu{
-
-display:flex;
-
-flex-direction:column;
-
-gap:14px;
-
-}
-
-.quick-menu a{
-
-background:#2563eb;
-
-color:white;
-
-text-decoration:none;
-
-padding:14px;
-
-border-radius:14px;
-
-text-align:center;
-
-font-weight:bold;
-
-transition:.25s;
-
-}
-
-.quick-menu a:hover{
-
-background:#1d4ed8;
-
-}
-
-@media(max-width:991px){
-
-.content-grid{
-
-grid-template-columns:1fr;
-
-}
-
-.main-content{
-
-margin-left:0;
-
-}
-
-.sidebar{
-
-position:relative;
-
-width:100%;
-
-height:auto;
-
-}
-
-.layout{
-
-flex-direction:column;
-
-}
-
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="layout">
-
-<div class="sidebar">
-
-<h2>
-
-GUIDE PANEL
-
-</h2>
-
-<ul>
-
-<li>
-
-<a
-href="dashboard.php"
-class="active">
-
-Dashboard
-
-</a>
-
-</li>
-
-<li>
-
-<a href="booking.php">
-
-Booking
-
-<span class="badge">
-
-<?= $total_pending ?>
-
-</span>
-
-</a>
-
-</li>
-
-<li>
-
-<a href="tugas.php">
-
-Tugas Saya
-
-</a>
-
-</li>
-
-<li>
-
-<a href="../logout.php">
-
-Logout
-
-</a>
-
-</li>
-
-</ul>
-
-</div>
-
-<div class="main-content">
-
-<div class="topbar">
-
-<div class="page-title">
-
-Dashboard Guide
-
-</div>
-
-<div class="admin-box">
-
-<?= e($_SESSION['nama']) ?>
-
-</div>
-
-</div>
-
-<div class="cards">
-
-<div class="card">
-
-<h3>
-
-Total Booking
-
-</h3>
-
-<div class="number">
-
-<?= $total_booking ?>
-
-</div>
-
-<div class="desc">
-
-Seluruh booking Anda
-
-</div>
-
-</div>
-
-<div class="card">
-
-<h3>
-
-Menunggu Konfirmasi
-
-</h3>
-
-<div class="number">
-
-<?= $total_pending ?>
-
-</div>
-
-<div class="desc">
-
-Booking perlu tindakan
-
-</div>
-
-</div>
-
-<div class="card">
-
-<h3>
-
-Booking Diterima
-
-</h3>
-
-<div class="number">
-
-<?= $total_accepted ?>
-
-</div>
-
-<div class="desc">
-
-Guide accepted
-
-</div>
-
-</div>
-
-</div>
-
-<div class="content-grid">
-
-<div class="table-card">
-
-<h2>
-
-Booking Terbaru
-
-</h2>
-
-<div style="overflow-x:auto;">
-
-<table>
-
-<tr>
-
-<th>ID</th>
-
-<th>Customer</th>
-
-<th>Status</th>
-
-</tr>
-
-<?php
-
-$q_booking =
-mysqli_query(
-
-$koneksi,
-
-"SELECT *
-
-FROM booking
-
-WHERE guide_id='$id_guide'
-
-ORDER BY id DESC
-
-LIMIT 5"
-
-);
-
-if(
-mysqli_num_rows($q_booking)>0
-){
-
-while(
-$row=
-mysqli_fetch_assoc($q_booking)
-){
-
-?>
-
-<tr>
-
-<td>
-
-#<?= $row['id'] ?>
-
-</td>
-
-<td>
-
-<?= e(
-$row['nama_customer']
-?? '-'
-) ?>
-
-</td>
-
-<td>
-
-<?= e(
-$row['status']
-) ?>
-
-</td>
-
-</tr>
-
-<?php
-
-}
-
-}else{
-
-?>
-
-<tr>
-
-<td colspan="3">
-
-Belum ada booking.
-
-</td>
-
-</tr>
-
-<?php
-
-}
-
-?>
-
-</table>
-
-</div>
-
-</div>
-
-<div class="right-panel">
-
-<div class="panel-card">
-
-<h2>
-
-Aktivitas Guide
-
-</h2>
-
-<div class="activity">
-
-<div class="item">
-
-📌 Booking baru masuk
-
-</div>
-
-<div class="item">
-
-📌 Periksa booking pending
-
-</div>
-
-<div class="item">
-
-📌 Update status guide
-
-</div>
-
-</div>
-
-</div>
-
-<br>
-
-<div class="panel-card">
-
-<h2>
-
-Quick Menu
-
-</h2>
-
-<div class="quick-menu">
-
-<a href="booking.php">
-
-Kelola Booking
-
-</a>
-
-<a href="tugas.php">
-
-Lihat Tugas
-
-</a>
-
-<a href="../logout.php">
-
-Logout
-
-</a>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</body>
-
 </html>

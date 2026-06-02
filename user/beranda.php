@@ -8,8 +8,8 @@ $destinations = [
         "difficulty" => "Sulit",
         "difficulty_class" => "sulit",
         "duration" => "2 - 3 Hari",
-        "price" => "Mulai Rp 800.000",
-        "image" => "images/rinjani.jpg",
+        "price" => "Mulai Rp 300.000",
+        "image" => "6a193065f14f2_destinasi",
     ],
     [
         "name" => "Bukit Pergasingan",
@@ -18,7 +18,7 @@ $destinations = [
         "difficulty_class" => "mudah",
         "duration" => "2 - 4 Jam",
         "price" => "Mulai Rp 100.000",
-        "image" => "images/pergasingan.jpg",
+        "image" => "../upload/6a1bab4cbe9b2_destinasi",
     ],
     [
         "name" => "Bukit Sempana",
@@ -26,8 +26,8 @@ $destinations = [
         "difficulty" => "Menengah",
         "difficulty_class" => "menengah",
         "duration" => "4 - 7 Jam",
-        "price" => "Mulai Rp 150.000",
-        "image" => "images/sempana.jpg",
+        "price" => "Mulai Rp 100.000",
+        "image" => "../upload/6a192d57899da_destinasi",
     ],
     [
         "name" => "Bukit Anak Dara",
@@ -35,8 +35,8 @@ $destinations = [
         "difficulty" => "Mudah",
         "difficulty_class" => "mudah",
         "duration" => "4 - 6 Jam",
-        "price" => "Mulai Rp 150.000",
-        "image" => "images/anakdara.jpg",
+        "price" => "Mulai Rp 100.000",
+        "image" => "../upload/6a1bab3bc6ee4_destinasi",
     ],
 ];
 
@@ -225,7 +225,7 @@ $why_us = [
             position: absolute; inset: 0;
             background:
                 linear-gradient(to bottom, rgba(10,25,18,.35) 0%, rgba(10,25,18,.15) 40%, rgba(10,25,18,.72) 100%),
-                url('images/hero-bg.jpg') center center / cover no-repeat;
+                url('../upload/rinjani4.jpg') center center / cover no-repeat;
             transform: scale(1.04);
             transition: transform 8s ease-out;
         }
@@ -979,22 +979,22 @@ $why_us = [
         $testimonials = [
             [
                 "text"   => "Pengalaman yang luar biasa! Guide-nya sangat profesional dan ramah. Jalur yang dipilih aman dan pemandangannya memukau. Pasti akan kembali lagi!",
-                "name"   => "Andi Pratama",
-                "role"   => "Pendaki dari Jakarta",
+                "name"   => "Andi Susanto",
+                "role"   => "Pendaki dari Jawa Tengah",
                 "init"   => "AP",
                 "stars"  => 5,
             ],
             [
                 "text"   => "Paket premiumnya worth it banget. Semua fasilitas lengkap, makanan enak, dan guidenya berpengalaman. Dokumentasi foto juga keren! Highly recommended.",
-                "name"   => "Sari Dewi",
-                "role"   => "Pendaki dari Surabaya",
+                "name"   => "Lalu Arya",
+                "role"   => "Pendaki dari Sumbawa",
                 "init"   => "SD",
                 "stars"  => 5,
             ],
             [
                 "text"   => "Ini pertama kali saya mendaki dan saya pilih Rinjani Guide. Keputusan terbaik! Guidenya sabar banget nemenin saya sampai puncak. Terima kasih!",
-                "name"   => "Budi Santoso",
-                "role"   => "Pendaki Pemula dari Bandung",
+                "name"   => "Neza Khulaifia",
+                "role"   => "Pendaki Pemula dari Lombok Utara",
                 "init"   => "BS",
                 "stars"  => 5,
             ],
@@ -1023,8 +1023,8 @@ $why_us = [
         <!-- Brand -->
         <div class="footer-brand">
             <div class="logo-wrap">
-                <?php if (file_exists('images/logo.png')): ?>
-                    <img src="images/logo.png" alt="Rinjani Guide">
+                <?php if (file_exists('../upload/logo.png')): ?>
+                    <img src="../upload/logo.png" alt="Rinjani Guide">
                 <?php else: ?>
                     <div class="logo-placeholder">LOGO HERE</div>
                 <?php endif; ?>
@@ -1060,7 +1060,6 @@ $why_us = [
             <div class="footer-heading">Navigasi</div>
             <ul class="footer-links">
                 <li><a href="beranda.php">Beranda</a></li>
-                <li><a href="paket.php">Destinasi</a></li>
                 <li><a href="paket.php">Paket Pendakian</a></li>
                 <li><a href="tentang.php">Tentang Kami</a></li>
                 <li><a href="#testimonials">Testimoni</a></li>
@@ -1088,7 +1087,7 @@ $why_us = [
                 </div>
                 <div class="footer-contact-item">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.52 12 19.79 19.79 0 01.47 3.4 2 2 0 012.44 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.91 9.4a16 16 0 006.72 6.72l.8-.8a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
-                    <a href="https://wa.me/6281234567890" style="color:inherit;text-decoration:none;">+62 812-3456-7890</a>
+                    <a href="https://wa.me/6283129650994" style="color:inherit;text-decoration:none;">+62 831-2965-0994</a>
                 </div>
                 <div class="footer-contact-item">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>

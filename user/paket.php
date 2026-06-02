@@ -41,8 +41,6 @@ FILTER TAB
 $filters = [
 
     ["key" => "semua", "label" => "Semua"],
-    ["key" => "1-hari", "label" => "1 Hari"],
-    ["key" => "2-3-hari", "label" => "2-3 Hari"],
     ["key" => "mudah", "label" => "Mudah"],
     ["key" => "menengah", "label" => "Menengah"],
     ["key" => "sulit", "label" => "Sulit"],
@@ -1165,9 +1163,9 @@ $filtered = array_filter($pakets, function ($p) use ($active_filter) {
 
     <!-- ===== NAVBAR ===== -->
     <nav class="navbar" id="navbar">
-        <a class="navbar-logo" href="index.php">
-            <?php if (file_exists('images/logo.png')): ?>
-                <img src="images/logo.png" alt="Rinjani Guide Logo">
+        <a class="navbar-logo" href="beranda.php">
+            <?php if (file_exists('../upload/logohitam.png')): ?>
+                <img src="../upload/logohitam.png" alt="Rinjani Guide Logo">
             <?php else: ?>
                 <div class="logo-placeholder">LOGO HERE</div>
             <?php endif; ?>
@@ -1202,7 +1200,7 @@ $filtered = array_filter($pakets, function ($p) use ($active_filter) {
         <div class="page-header reveal">
             <h1 class="page-title">Paket Pendakian</h1>
             <nav class="breadcrumb">
-                <a href="index.php">Beranda</a>
+                <a href="beranda.php">Beranda</a>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="9 18 15 12 9 6" />
                 </svg>
@@ -1339,8 +1337,7 @@ $filtered = array_filter($pakets, function ($p) use ($active_filter) {
                     </div>
 
                     <div class="card-footer" onclick="event.stopPropagation()">
-
-                        <a href="../user/booking.php?destinasi=<?= urlencode($p['name']) ?>"
+                        <a href="../user/booking.php?destinasi=<?= urlencode($p['id']) ?>"
                             class="btn-book-now">
                             Booking Sekarang
                         </a>

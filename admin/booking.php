@@ -18,7 +18,7 @@ ASSIGN GUIDE
 
 if(isset($_POST['assign'])){
 
-$booking_id = intval($_POST['booking_id']);
+$booking_id = intval($_POST['user_id'] ?? 0);
 $guide_id   = intval($_POST['guide_id']);
 
 $cekguide = mysqli_query(
@@ -44,14 +44,13 @@ $koneksi,
 SET
 
 guide_id='$guide_id',
-status='Guide Ditugaskan'
-
+status='Menunggu Guide'
 WHERE id='$booking_id'"
 
 );
 
 $pesan =
-"Admin menugaskan Anda ke booking #".$booking_id;
+"Booking baru ditugaskan kepada Anda. ID Booking: ".$booking_id;
 
 mysqli_query(
 
@@ -59,8 +58,7 @@ $koneksi,
 
 "INSERT INTO notifikasi(
 
-guide_id,
-booking_id,
+user_id,
 pesan,
 status_baca
 
@@ -69,8 +67,9 @@ status_baca
 VALUES(
 
 '$guide_id',
-'$booking_id',
+
 '$pesan',
+
 'Belum Dibaca'
 
 )"
@@ -218,10 +217,10 @@ guide.nama AS guide_nama
 
 FROM booking
 
-INNER JOIN users
+LEFT JOIN users
 ON booking.user_id = users.id
 
-INNER JOIN destinasi
+LEFT JOIN destinasi
 ON booking.destinasi_id = destinasi.id
 
 LEFT JOIN users AS guide

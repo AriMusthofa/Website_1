@@ -7,19 +7,19 @@ $page_title = "Tentang Kami — Rinjani Guide";
 $stats = [
     [
         "icon"  => "mountain",
-        "value" => "10+",
+        "value" => "5+",
         "label" => "Tahun Pengalaman",
         "desc"  => "Melayani pendaki sejak 2013",
     ],
     [
         "icon"  => "users",
-        "value" => "5.000+",
+        "value" => "100+",
         "label" => "Pendaki Puas",
         "desc"  => "Telah mendaki bersama kami",
     ],
     [
         "icon"  => "guide",
-        "value" => "25+",
+        "value" => "10+",
         "label" => "Guide Profesional",
         "desc"  => "Berpengalaman & bersertifikat",
     ],
@@ -62,10 +62,10 @@ $why_us = [
 ];
 
 $team = [
-    ["name" => "Ahmad Fauzi",    "role" => "Lead Guide & Founder",      "exp" => "12 tahun pengalaman", "img" => "images/team-1.jpg"],
-    ["name" => "Baiq Nuraini",   "role" => "Operations Manager",        "exp" => "8 tahun pengalaman",  "img" => "images/team-2.jpg"],
-    ["name" => "Lalu Hendra",    "role" => "Senior Mountain Guide",     "exp" => "10 tahun pengalaman", "img" => "images/team-3.jpg"],
-    ["name" => "Siti Rahmawati", "role" => "Safety & Equipment Officer","exp" => "6 tahun pengalaman",  "img" => "images/team-4.jpg"],
+    ["name" => "Sulaiman",    "role" => "Lead Guide & Founder",      "exp" => "5 tahun pengalaman", "img" => "images/team-1.jpg"],
+    ["name" => "Putra Jaya",   "role" => "Operations Manager",        "exp" => "3 tahun pengalaman",  "img" => "images/team-2.jpg"],
+    ["name" => "Zahid Faruqi",    "role" => "Senior Mountain Guide",     "exp" => "2 tahun pengalaman", "img" => "images/team-3.jpg"],
+    ["name" => "Ari Musthofa", "role" => "Safety & Equipment Officer","exp" => "2 tahun pengalaman",  "img" => "images/team-4.jpg"],
 ];
 ?>
 <!DOCTYPE html>
@@ -217,7 +217,7 @@ $team = [
             position: absolute; inset: 0;
             background:
                 linear-gradient(to bottom, rgba(10,22,14,.38) 0%, rgba(10,22,14,.62) 100%),
-                url('images/about-hero.jpg') center 35% / cover no-repeat;
+                url('../upload/rinjani2.jpg') center 35% / cover no-repeat;
             transform: scale(1.04);
             transition: transform 6s ease-out;
         }
@@ -680,9 +680,9 @@ $team = [
 
 <!-- ===== NAVBAR ===== -->
 <nav class="navbar" id="navbar">
-    <a class="nav-logo" href="index.php">
-        <?php if (file_exists('images/logo.png')): ?>
-            <img src="images/logo.png" alt="Rinjani Guide">
+    <a class="nav-logo" href="beranda.php">
+        <?php if (file_exists('../upload/logohitam.png')): ?>
+            <img src="../upload/logohitam.png" alt="Rinjani Guide">
         <?php else: ?>
             <div class="logo-ph">LOGO HERE</div>
         <?php endif; ?>
@@ -754,8 +754,8 @@ $team = [
 
         <!-- Image -->
         <div class="story-img-wrap reveal rd2">
-            <?php if (file_exists('images/team-photo.jpg')): ?>
-                <img class="story-img" src="images/team-photo.jpg" alt="Tim Rinjani Guide">
+            <?php if (file_exists('../upload/rinjani3.jpg')): ?>
+                <img class="story-img" src="../upload/rinjani3.jpg" alt="Tim Rinjani Guide">
             <?php else: ?>
                 <div class="story-img-placeholder">
                     <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.2">
@@ -921,8 +921,8 @@ $team = [
 <footer id="contact">
     <div class="footer-grid">
         <div class="footer-logo">
-            <?php if (file_exists('images/logo.png')): ?>
-                <img src="images/logo.png" alt="Rinjani Guide" style="filter:brightness(0) invert(1)">
+            <?php if (file_exists('../upload/logo.png')): ?>
+                <img src="../upload/logo.png" alt="Rinjani Guide" style="filter:brightness(0) invert(1)">
             <?php else: ?>
                 <div class="logo-ph">LOGO HERE</div>
             <?php endif; ?>
@@ -931,18 +931,18 @@ $team = [
         <div>
             <div class="footer-h">Navigasi</div>
             <ul class="footer-links">
-                <li><a href="index.php">Beranda</a></li>
-                <li><a href="paket-pendakian.php">Paket Pendakian</a></li>
-                <li><a href="tentang-kami.php">Tentang Kami</a></li>
-                <li><a href="index.php#contact">Kontak</a></li>
+                <li><a href="beranda.php">Beranda</a></li>
+                <li><a href="paket.php">Paket Pendakian</a></li>
+                <li><a href="tentang.php">Tentang Kami</a></li>
+                <li><a href="kontak.php">Kontak</a></li>
             </ul>
         </div>
         <div>
             <div class="footer-h">Kontak</div>
             <ul class="footer-links">
-                <li><a href="https://wa.me/6281234567890">+62 812-3456-7890</a></li>
+                <li><a href="https://wa.me/6283129650994">+62 831-2965-0994</a></li>
                 <li><a href="mailto:info@rinjaniguide.com">info@rinjaniguide.com</a></li>
-                <li><a href="#">Sembalun, Lombok Timur</a></li>
+                <li><a href="kontak.php">Sembalun, Lombok Timur</a></li>
             </ul>
         </div>
     </div>

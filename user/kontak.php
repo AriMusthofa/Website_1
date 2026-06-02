@@ -62,8 +62,8 @@ $contacts = [
     ],
 ];
 
-$address  = "Jl. Pariwisata Senaru, Bayan, Lombok Utara, Nusa Tenggara Barat 83354, Indonesia";
-$map_src  = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3956.3!2d116.4!3d-8.3!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dcde7b0ad7c6a1d%3A0x1234abcd!2sRinjani+Guide!5e0!3m2!1sid!2sid!4v1700000000000!5m2!1sid!2sid";
+$address = "Jl. Pelor Mas Raya No. III, Kekalik Jaya, Kec. Sekarbela, Kota Mataram, Nusa Tenggara Barat 83126";
+$map_src = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3945.0387580465713!2d116.089543274336!3d-8.592272087231626!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dcdbf7ed05603ab%3A0x6b5771dd5cbe0d20!2sUniversitas%20Teknologi%20Mataram!5e0!3m2!1sid!2sid!4v1780202172532!5m2!1sid!2sid";
 
 // ---- Handle form submission ----
 $form_success = false;
@@ -243,7 +243,7 @@ $csrf = $_SESSION['csrf'];
             position: absolute; inset: 0;
             background:
                 linear-gradient(to bottom, rgba(8,18,12,.4) 0%, rgba(8,18,12,.65) 100%),
-                url('images/contact-hero.jpg') center 40% / cover no-repeat;
+                url('../upload/rinjani1.jpg') center 40% / cover no-repeat;
             transform: scale(1.04);
             transition: transform 6s ease-out;
         }
@@ -328,10 +328,7 @@ $csrf = $_SESSION['csrf'];
         .contact-info .c-desc { font-size: 13px; color: var(--text-light); margin-bottom: 5px; }
         .contact-info .c-val {
             font-size: 16px; font-weight: 700; color: var(--text-dark);
-        }
-
-        /* TikTok card spans full width */
-        .contact-card.full { grid-column: 1 / -1; max-width: calc(50% - 9px); }
+        };
 
         /* ===== MAP SECTION ===== */
         .map-section { background: var(--cream); padding: 80px 5%; }
@@ -587,8 +584,8 @@ $csrf = $_SESSION['csrf'];
 <nav class="navbar" id="navbar">
     <div class="nav-logo">
         <a href="index.php">
-            <?php if (file_exists('images/logo.png')): ?>
-                <img src="images/logo.png" alt="Rinjani Guide">
+            <?php if (file_exists('../upload/logohitam.png')): ?>
+                <img src="../upload/logohitam.png" alt="Rinjani Guide">
             <?php else: ?>
                 <div class="logo-ph">LOGO HERE</div>
             <?php endif; ?>
@@ -601,7 +598,7 @@ $csrf = $_SESSION['csrf'];
         <li><a href="tentang.php">Tentang Kami</a></li>
         <li><a href="kontak.php" class="active">Kontak</a></li>
         <li>
-            <a href="#form" class="btn-nav">
+            <a href="booking.php" class="btn-nav">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                     <rect x="3" y="4" width="18" height="18" rx="2"/>
                     <line x1="16" y1="2" x2="16" y2="6"/>
@@ -733,7 +730,7 @@ $csrf = $_SESSION['csrf'];
 
         <div class="map-wrap reveal">
             <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31648.94!2d116.4317!3d-8.3432!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dcdf0de72d58099%3A0xa7bb5a29f3855fe7!2sSenaru%2C%20Bayan%2C%20North%20Lombok%20Regency%2C%20West%20Nusa%20Tenggara%2C%20Indonesia!5e0!3m2!1sen!2sid!4v1700000000000!5m2!1sen!2sid"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3945.0387580465713!2d116.089543274336!3d-8.592272087231626!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dcdbf7ed05603ab%3A0x6b5771dd5cbe0d20!2sUniversitas%20Teknologi%20Mataram!5e0!3m2!1sid!2sid!4v1780202172532!5m2!1sid!2sid"
                 allowfullscreen loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade"
                 title="Lokasi Rinjani Guide">
@@ -741,7 +738,7 @@ $csrf = $_SESSION['csrf'];
         </div>
 
         <div style="text-align:center;margin-top:16px">
-            <a href="https://goo.gl/maps/senaru" target="_blank" rel="noopener"
+            <a href="https://goo.gl/maps/mataram" target="_blank" rel="noopener"
                style="color:var(--green-main);font-size:14px;font-weight:600;text-decoration:none;">
                 📍 Buka di Google Maps →
             </a>
@@ -784,7 +781,7 @@ $csrf = $_SESSION['csrf'];
                         </div>
                         <div class="info-item-text">
                             <div class="lbl">Telepon / WhatsApp</div>
-                            <div class="val">+62 812-3456-7890</div>
+                            <div class="val">+62 831-2965-0994</div>
                         </div>
                     </div>
                     <div class="info-item">
@@ -808,7 +805,7 @@ $csrf = $_SESSION['csrf'];
                         </div>
                         <div class="info-item-text">
                             <div class="lbl">Alamat</div>
-                            <div class="val">Jl. Pariwisata Senaru, Bayan, Lombok Utara</div>
+                            <div class="val">Jl.Pelor Mas Raya No.III, Kekalik Jaya, Sekarbela, Mataram</div>
                         </div>
                     </div>
                 </div>
@@ -918,7 +915,7 @@ $csrf = $_SESSION['csrf'];
                 <p>Tim kami siap membantu 24/7 untuk semua kebutuhan pendakian Anda.</p>
             </div>
         </div>
-        <a href="https://wa.me/6281234567890?text=Halo%2C+saya+butuh+bantuan+tentang+pendakian"
+        <a href="https://wa.me/6283129650994?text=Halo%2C+saya+butuh+bantuan+tentang+pendakian"
            target="_blank" rel="noopener" class="btn-wa">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
@@ -933,8 +930,8 @@ $csrf = $_SESSION['csrf'];
 <footer>
     <div class="footer-grid">
         <div class="footer-logo">
-            <?php if (file_exists('images/logo.png')): ?>
-                <img src="images/logo.png" alt="Rinjani Guide">
+            <?php if (file_exists('../upload/logo.png')): ?>
+                <img src="../upload/logo.png" alt="Rinjani Guide">
             <?php else: ?>
                 <div class="logo-ph">LOGO HERE</div>
             <?php endif; ?>
@@ -952,7 +949,7 @@ $csrf = $_SESSION['csrf'];
         <div>
             <div class="footer-h">Sosial Media</div>
             <ul class="footer-links">
-                <li><a href="https://wa.me/6281234567890" target="_blank">WhatsApp</a></li>
+                <li><a href="https://wa.me/6283129650994" target="_blank">WhatsApp</a></li>
                 <li><a href="https://instagram.com/rinjaniguide" target="_blank">Instagram</a></li>
                 <li><a href="https://facebook.com/rinjaniguide" target="_blank">Facebook</a></li>
                 <li><a href="https://tiktok.com/@rinjaniguide" target="_blank">TikTok</a></li>
