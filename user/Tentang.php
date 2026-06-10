@@ -63,9 +63,10 @@ $why_us = [
 
 $team = [
     ["name" => "Sulaiman",    "role" => "Lead Guide & Founder",      "exp" => "5 tahun pengalaman", "img" => "../upload/Sulaiman.jpg"],
-    ["name" => "Putra Jaya",   "role" => "Operations Manager",        "exp" => "3 tahun pengalaman",  "img" => "../upload/Putra.jpg"],
-    ["name" => "Zahid Faruqi",    "role" => "Senior Mountain Guide",     "exp" => "2 tahun pengalaman", "img" => "../upload/Faruq.jpg"],
+    ["name" => "Putra Jaya",   "role" => "Senior Mountain Guide",        "exp" => "3 tahun pengalaman",  "img" => "../upload/Putra.jpg"],
+    ["name" => "Sataruddin",    "role" => "Operations Manage",     "exp" => "2 tahun pengalaman", "img" => "../upload/Satar.jpg"],
     ["name" => "Ari Musthofa", "role" => "Safety & Equipment Officer","exp" => "2 tahun pengalaman",  "img" => "../upload/Ari.jpg"],
+    ["name" => "Zahid Faruqi", "role" => "Trail & Logistics Guide",   "exp" => "1 tahun pengalaman",  "img" => "../upload/Faruq.jpg"],
 ];
 ?>
 <!DOCTYPE html>
@@ -495,50 +496,59 @@ $team = [
         .why-desc { font-size: 14px; color: var(--text-light); line-height: 1.65; }
 
         /* ===== TEAM ===== */
-        .team-section { background: var(--white); }
+        .team-section { background: var(--white); padding-left: 3%; padding-right: 3%; }
         .team-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr);
-            gap: 22px; max-width: 1200px; margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+            margin-top: 50px;
+            width: 100%;
         }
         .team-card {
             background: var(--cream);
             border: 1.5px solid var(--border);
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-sm);
             overflow: hidden;
             transition: transform var(--tr), box-shadow var(--tr);
             text-align: center;
+            min-width: 0;
         }
-        .team-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); }
+        .team-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
         .team-photo-wrap {
             position: relative; overflow: hidden;
             background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
         }
         .team-photo {
-            width: 100%; aspect-ratio: 1/1;
+            width: 100%; aspect-ratio: 4/5;
             object-fit: cover; display: block;
             transition: transform .5s ease;
         }
         .team-card:hover .team-photo { transform: scale(1.06); }
         .team-photo-placeholder {
-            width: 100%; aspect-ratio: 1/1;
+            width: 100%; aspect-ratio: 4/5;
             display: flex; align-items: center; justify-content: center;
             background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
         }
-        .team-photo-placeholder svg { opacity: .3; }
-        .team-info { padding: 18px 16px 20px; }
+        .team-photo-placeholder svg { opacity: .3; width: 36px; height: 36px; }
+        .team-info { padding: 12px 10px 14px; }
         .team-name {
             font-family: 'Playfair Display', serif;
-            font-size: 17px; font-weight: 700;
-            color: var(--text-dark); margin-bottom: 4px;
+            font-size: 14px; font-weight: 700;
+            color: var(--text-dark); margin-bottom: 3px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .team-role { font-size: 13px; color: var(--green-main); font-weight: 500; margin-bottom: 6px; }
+        .team-role {
+            font-size: 11px; color: var(--green-main); font-weight: 500;
+            margin-bottom: 6px; line-height: 1.4;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
         .team-exp {
-            display: inline-flex; align-items: center; gap: 5px;
-            font-size: 12px; color: var(--text-light);
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 11px; color: var(--text-light);
             background: var(--white); border: 1px solid var(--border);
-            padding: 3px 10px; border-radius: 50px;
+            padding: 2px 8px; border-radius: 50px;
         }
-        .team-exp svg { color: var(--green-main); }
+        .team-exp svg { color: var(--green-main); width: 10px; height: 10px; }
 
         /* ===== CTA ===== */
         .cta-strip {
@@ -646,7 +656,9 @@ $team = [
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1100px) {
             .why-grid  { grid-template-columns: repeat(2, 1fr); }
-            .team-grid { grid-template-columns: repeat(2, 1fr); }
+            .team-grid { grid-template-columns: repeat(5, 1fr); gap: 10px; }
+            .team-name { font-size: 12px; }
+            .team-info { padding: 10px 8px 12px; }
             .stats-grid{ grid-template-columns: repeat(2, 1fr); }
             .stat-box:nth-child(2) { border-right: none; }
             .stat-box:nth-child(3) { border-top: 1px solid var(--border); }
@@ -665,14 +677,16 @@ $team = [
         }
         @media (max-width: 600px) {
             .why-grid   { grid-template-columns: 1fr; }
-            .team-grid  { grid-template-columns: 1fr 1fr; }
+            .team-grid  { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .team-name  { font-size: 13px; white-space: normal; }
+            .team-role  { font-size: 11px; }
             .stats-grid { grid-template-columns: 1fr; }
             .stat-box   { border-right: none !important; border-top: 1px solid var(--border); }
             .stat-box:first-child { border-top: none; }
             .footer-grid{ grid-template-columns: 1fr; gap: 28px; }
         }
         @media (max-width: 420px) {
-            .team-grid { grid-template-columns: 1fr; }
+            .team-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>

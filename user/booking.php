@@ -3,15 +3,36 @@
 //  Rinjani Guide — Booking Pendakian (Step 1: Pesanan)
 //  Koneksi: koneksi.php (mysqli) | DB: Projek_CRUD | Tabel: destinasi
 // =====================================================================
-session_start();
+
+// ── Security: session + helper functions (csrf, redirect, dll)
+require_once '../config/security.php';
+
+// ── Guard: wajib login sebagai customer
+if (!isset($_SESSION['id'])) {
+    // Simpan URL tujuan agar setelah login langsung diarahkan ke sini
+    $_SESSION['redirect_after_login'] = 'user/booking.php' .
+        (!empty($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : '');
+    redirect('../login.php');
+    exit;
+}
+
+if ($_SESSION['role'] !== 'customer') {
+    // Admin/guide tidak boleh akses halaman booking customer
+    switch ($_SESSION['role']) {
+        case 'admin': redirect('../admin/dashboard.php'); break;
+        case 'guide': redirect('../guide/Dashboard.php'); break;
+        default:      redirect('../login.php');
+    }
+    exit;
+}
 
 $page_title = "Booking Pendakian — Rinjani Guide";
 
-// ── Koneksi via koneksi.php ───────────────────────────────────────────
+// ── Koneksi via koneksi.php
 require_once '../config/koneksi.php';
 // $koneksi (mysqli) sudah tersedia setelah require
 
-// ── Ambil semua destinasi dari DB ────────────────────────────────────
+// ── Ambil semua destinasi dari DB
 $destinasi_list = [];
 $db_error       = null;
 
@@ -29,7 +50,7 @@ if ($result) {
     $db_error = "Gagal memuat destinasi: " . mysqli_error($koneksi);
 }
 
-// ── Auto-fill dari paket-pendakian.php (?dest=ID) ────────────────────
+// ── Auto-fill dari paket-pendakian.php (?dest=ID)
 $prefill_id = 0;
 if (isset($_GET['dest']) && (int)$_GET['dest'] > 0) {
     $prefill_id = (int)$_GET['dest'];
@@ -38,7 +59,7 @@ if (isset($_GET['dest']) && (int)$_GET['dest'] > 0) {
     $prefill_id = (int)$_SESSION['prefill_dest_id'];
 }
 
-// ── Handle POST ───────────────────────────────────────────────────────
+// ── Handle POST
 $errors   = [];
 $formdata = $_SESSION['booking_form'] ?? [];
 
@@ -94,14 +115,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION['booking_form'] = $formdata;
 }
 
-// ── Tentukan destinasi aktif ──────────────────────────────────────────
+// ── Tentukan destinasi aktif
 $active_dest_id = (int)($formdata['dest_id'] ?? $prefill_id ?? 0);
 $selected_dest  = null;
 foreach ($destinasi_list as $d) {
     if ((int)$d['id'] === $active_dest_id) { $selected_dest = $d; break; }
 }
 
-// ── Helper ────────────────────────────────────────────────────────────
+// ── Helper
 function rupiah($n) {
     if (is_numeric($n) && (int)$n > 0)
         return 'Rp ' . number_format((int)$n, 0, ',', '.');
@@ -141,7 +162,7 @@ function hargaNum($d) { return (int)($d['price_num'] ?? 0); }
         ::-webkit-scrollbar-track { background: var(--cr); }
         ::-webkit-scrollbar-thumb { background: var(--gl); border-radius: 3px; }
 
-        /* ━━ NAVBAR ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        /* ━━ NAVBAR*/
         .navbar {
             position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
             height: var(--nh); display: flex; align-items: center;
@@ -198,7 +219,7 @@ function hargaNum($d) { return (int)($d['price_num'] ?? 0); }
         .mmenu a:hover { color: var(--g); }
         .mmenu .bmb { display: block; background: var(--g); color: var(--wh) !important; padding: 12px 22px; border-radius: 8px; text-align: center; font-weight: 600; }
 
-        /* ━━ HERO BANNER ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        /* ━━ HERO BANNER */
         .hero {
             margin-top: var(--nh); min-height: 220px;
             display: flex; align-items: center;
@@ -221,7 +242,7 @@ function hargaNum($d) { return (int)($d['price_num'] ?? 0); }
         .breadcrumb a { color: var(--tl); text-decoration: none; transition: color .2s; }
         .breadcrumb a:hover, .breadcrumb .cur { color: var(--g); font-weight: 600; }
 
-        /* ━━ STEPPER ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        /* ━━ STEPPER */
         .stepper-bar { background: var(--wh); border-bottom: 1px solid var(--bd); padding: 18px 5%; }
         .stepper { display: flex; align-items: center; max-width: 700px; }
         .si { display: flex; align-items: center; flex: 1; }
@@ -240,7 +261,7 @@ function hargaNum($d) { return (int)($d['price_num'] ?? 0); }
         .sline { flex: 1; height: 2px; background: var(--bd); margin: 0 16px; border-radius: 1px; }
         .sline.done { background: var(--g); }
 
-        /* ━━ PAGE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        /* ━━ PAGE */
         .page { max-width: 1100px; margin: 0 auto; padding: 40px 5% 80px; }
 
         /* Alerts */
@@ -276,7 +297,7 @@ function hargaNum($d) { return (int)($d['price_num'] ?? 0); }
         .pfill-chg { margin-left: auto; flex-shrink: 0; display: flex; align-items: center; gap: 5px; font-size: 13px; color: var(--gm); font-weight: 600; text-decoration: none; white-space: nowrap; transition: color .2s; }
         .pfill-chg:hover { color: var(--gd); }
 
-        /* ━━ MAIN CARD ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        /* ━━ MAIN CARD */
         .card { background: var(--wh); border: 1.5px solid var(--bd); border-radius: var(--r2); padding: 38px 42px; box-shadow: var(--sh0); }
         .card-h   { font-size: 22px; font-weight: 700; color: var(--td); margin-bottom: 4px; }
         .card-sub { font-size: 14px; color: var(--tl); margin-bottom: 32px; }
@@ -367,7 +388,7 @@ function hargaNum($d) { return (int)($d['price_num'] ?? 0); }
         .stb.show { opacity: 1; transform: none; pointer-events: all; }
         .stb:hover { background: var(--gd); transform: translateY(-3px); }
 
-        /* ━━ RESPONSIVE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        /* ━━ RESPONSIVE */
         @media (max-width: 900px)  { .c3 { grid-template-columns: 1fr 1fr; } }
         @media (max-width: 768px)  {
             .nav-menu { display: none; } .hamburger { display: flex; }
@@ -385,7 +406,7 @@ function hargaNum($d) { return (int)($d['price_num'] ?? 0); }
 </head>
 <body>
 
-<!-- ━━ NAVBAR ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- ━━ NAVBAR -->
 <nav class="navbar" id="navbar">
     <div class="nav-logo">
         <a href="../upload/logo.php">
@@ -427,7 +448,7 @@ function hargaNum($d) { return (int)($d['price_num'] ?? 0); }
     <a href="booking.php" class="bmb">Booking Sekarang</a>
 </div>
 
-<!-- ━━ HERO BANNER ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- ━━ HERO BANNER -->
 <div class="hero">
     <div class="hero-inner">
         <div class="hero-label">Booking Pendakian</div>
@@ -446,7 +467,7 @@ function hargaNum($d) { return (int)($d['price_num'] ?? 0); }
     </div>
 </div>
 
-<!-- ━━ STEPPER ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- ━━ STEPPER-->
 <div class="stepper-bar">
     <div class="stepper">
         <?php foreach (['Pesanan','Konfirmasi','Pembayaran'] as $i => $lbl):
@@ -461,7 +482,7 @@ function hargaNum($d) { return (int)($d['price_num'] ?? 0); }
     </div>
 </div>
 
-<!-- ━━ KONTEN HALAMAN ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- ━━ KONTEN HALAMAN -->
 <div class="page">
 
     <!-- Pesan error DB -->
@@ -546,7 +567,7 @@ function hargaNum($d) { return (int)($d['price_num'] ?? 0); }
     </div>
     <?php endif; ?>
 
-    <!-- ━━ FORM CARD ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+    <!-- ━━ FORM CARD -->
     <div class="card">
         <div class="card-h">Informasi Pesanan</div>
         <div class="card-sub">Lengkapi detail pesanan pendakian Anda</div>
@@ -726,7 +747,7 @@ function hargaNum($d) { return (int)($d['price_num'] ?? 0); }
     </svg>
 </button>
 
-<!-- ━━ DATA PHP → JS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- ━━ DATA PHP → JS  -->
 <script>
 // Data destinasi dikirim ke JS untuk kalkulasi harga real-time
 const DESTS = <?php
@@ -748,7 +769,7 @@ const DESTS = <?php
 const PFILL_ID = <?= $active_dest_id ?: 'null' ?>;
 </script>
 
-<!-- ━━ JAVASCRIPT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- ━━ JAVASCRIPT -->
 <script>
 (function () {
     'use strict';

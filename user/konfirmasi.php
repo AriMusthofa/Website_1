@@ -11,15 +11,15 @@ if (empty($_SESSION['booking_form']) || empty($_SESSION['booking_dest'])) {
     exit;
 }
 
-// ── Koneksi ──────────────────────────────────────────────────
+// ── Koneksi
 require_once '../config/koneksi.php';
 
-// ── Ambil data session ────────────────────────────────────────
+// ── Ambil data session
 $form  = $_SESSION['booking_form'];   // dest_id, tanggal, peserta, nama, wa, catatan
 $dest  = $_SESSION['booking_dest'];   // row dari tabel destinasi
 $total = (int)($_SESSION['booking_total'] ?? 0);
 
-// ── Handle aksi ──────────────────────────────────────────────
+// ── Handle aksi 
 $action = $_POST['action'] ?? ($_GET['action'] ?? '');
 
 // Kembali ke booking
@@ -57,7 +57,7 @@ if ($action === 'confirm') {
     }
 }
 
-// ── Helpers ───────────────────────────────────────────────────
+// ── Helpers 
 function rupiah($n) {
     return 'Rp ' . number_format((int)$n, 0, ',', '.');
 }
@@ -110,7 +110,7 @@ function tglIndo($tgl) {
         ::-webkit-scrollbar-track { background: var(--cr); }
         ::-webkit-scrollbar-thumb { background: var(--gl); border-radius: 3px; }
 
-        /* ─── NAVBAR ──────────────────────────────────────── */
+        /* ─── NAVBAR  */
         .navbar {
             position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
             height: var(--nh); display: flex; align-items: center;
@@ -165,7 +165,7 @@ function tglIndo($tgl) {
         .mmenu a:hover { color: var(--g); }
         .mmenu .bmb { display: block; background: var(--g); color: var(--wh) !important; padding: 12px 22px; border-radius: 8px; text-align: center; font-weight: 600; }
 
-        /* ─── HERO ────────────────────────────────────────── */
+        /* ─── HERO  */
         .hero {
             margin-top: var(--nh); min-height: 180px;
             display: flex; align-items: center;
@@ -186,7 +186,7 @@ function tglIndo($tgl) {
         .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(26px, 5vw, 46px); font-weight: 800; color: var(--td); line-height: 1.1; margin-bottom: 6px; }
         .hero-sub { font-size: 15px; color: var(--tl); }
 
-        /* ─── STEPPER ─────────────────────────────────────── */
+        /* ─── STEPPER  */
         .stepper-bar { background: var(--wh); border-bottom: 1px solid var(--bd); padding: 16px 5%; }
         .stepper { display: flex; align-items: center; max-width: 640px; }
         .si { display: flex; align-items: center; flex: 1; }
@@ -205,7 +205,7 @@ function tglIndo($tgl) {
         .sline { flex: 1; height: 2px; background: var(--bd); margin: 0 14px; border-radius: 1px; }
         .sline.done { background: var(--g); }
 
-        /* ─── PAGE ────────────────────────────────────────── */
+        /* ─── PAGE  */
         .page { max-width: 860px; margin: 0 auto; padding: 36px 5% 80px; }
 
         /* Alert error DB */
@@ -218,7 +218,7 @@ function tglIndo($tgl) {
         @keyframes aIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
         .alert-err svg { flex-shrink: 0; margin-top: 1px; }
 
-        /* ─── RINGKASAN CARD ──────────────────────────────── */
+        /* ─── RINGKASAN CARD  */
         .card {
             background: var(--wh); border: 1.5px solid var(--bd);
             border-radius: var(--r2); padding: 32px 36px;
@@ -297,7 +297,7 @@ function tglIndo($tgl) {
         .notice-text strong { font-size: 14px; color: var(--td); display: block; margin-bottom: 2px; }
         .notice-text span { font-size: 13px; color: var(--tl); }
 
-        /* ─── ACTIONS ─────────────────────────────────────── */
+        /* ─── ACTIONS */
         .btn-confirm {
             display: flex; align-items: center; justify-content: center; gap: 10px;
             width: 100%; padding: 16px 32px;

@@ -30,7 +30,7 @@ break;
 case 'customer':
 
 redirect(
-'user/dashboard.php'
+'user/beranda.php'
 );
 
 break;
@@ -186,9 +186,14 @@ break;
 
 case 'customer':
 
-redirect(
-'user/beranda.php'
+$dest = $_SESSION['redirect_after_login']
+    ?? 'user/beranda.php';
+
+unset(
+    $_SESSION['redirect_after_login']
 );
+
+redirect($dest);
 
 break;
 
@@ -447,6 +452,28 @@ confirmButtonColor:'#ef4444'
 </script>
 
 <?php } ?>
+
+<?php if(isset($_SESSION['register_success'])){ ?>
+
+<script>
+
+Swal.fire({
+
+icon:'success',
+
+title:'Registrasi Berhasil',
+
+text:'<?= e($_SESSION['register_success']) ?>',
+
+confirmButtonColor:'#22c55e'
+
+});
+
+</script>
+
+<?php
+unset($_SESSION['register_success']);
+} ?>
 
 </body>
 </html>

@@ -88,8 +88,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_message'])) {
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $form_error = 'Format email tidak valid.';
         } else {
-            // TODO: kirim email dengan mail() atau PHPMailer
-            // mail('info@rinjaniguide.com', "Pesan dari $nama: $subjek", $pesan, "Reply-To: $email");
             $form_success = true;
             $form_data    = [];
         }
@@ -840,13 +838,13 @@ $csrf = $_SESSION['csrf'];
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="nama">Nama Lengkap <span>*</span></label>
+                            <label for="nama">Nama Lengkap<span>*</span></label>
                             <input class="form-input" type="text" id="nama" name="nama"
                                 placeholder="Masukkan nama Anda"
                                 value="<?= htmlspecialchars($form_data['nama'] ?? '') ?>" required>
                         </div>
                         <div class="form-group">
-                            <label for="email">Email <span>*</span></label>
+                            <label for="email">Email<span>*</span></label>
                             <input class="form-input" type="email" id="email" name="email"
                                 placeholder="nama@email.com"
                                 value="<?= htmlspecialchars($form_data['email'] ?? '') ?>" required>
@@ -855,7 +853,7 @@ $csrf = $_SESSION['csrf'];
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="telp">No. Telepon / WhatsApp</label>
+                            <label for="telp">No.Telepon/WhatsApp</label>
                             <input class="form-input" type="tel" id="telp" name="telp"
                                 placeholder="+62 xxx-xxxx-xxxx"
                                 value="<?= htmlspecialchars($form_data['telp'] ?? '') ?>">
@@ -881,7 +879,7 @@ $csrf = $_SESSION['csrf'];
                     </div>
 
                     <div class="form-group">
-                        <label for="pesan">Pesan <span>*</span></label>
+                        <label for="pesan">Pesan<span>*</span></label>
                         <textarea class="form-textarea" id="pesan" name="pesan"
                             placeholder="Tuliskan pesan atau pertanyaan Anda di sini..."
                             maxlength="1000" required><?= htmlspecialchars($form_data['pesan'] ?? '') ?></textarea>

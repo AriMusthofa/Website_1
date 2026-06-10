@@ -7,10 +7,6 @@ $page_title = "Paket Pendakian - Rinjani Guide";
 
 require_once '../config/koneksi.php';
 
-/* ======================
-AMBIL DATA DATABASE
-====================== */
-
 $pakets = [];
 
 $query = mysqli_query($koneksi, "SELECT * FROM destinasi");
@@ -1223,7 +1219,7 @@ $filtered = array_filter($pakets, function ($p) use ($active_filter) {
                 <div class="stat-label">Rating Kepuasan</div>
             </div>
             <div class="stat-box">
-                <div class="stat-num">1+</div>
+                <div class="stat-num">5+</div>
                 <div class="stat-label">Tahun Pengalaman</div>
             </div>
         </div>
@@ -1342,7 +1338,6 @@ $filtered = array_filter($pakets, function ($p) use ($active_filter) {
                             Booking Sekarang
                         </a>
                     </div>
-
                 </div>
             <?php endforeach; ?>
 

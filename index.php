@@ -1,499 +1,222 @@
 <?php
-include 'config/koneksi.php';
 
-$query = mysqli_query(
-$koneksi,
-"SELECT * FROM destinasi ORDER BY id DESC"
-);
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+require_once 'config/koneksi.php';
+
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
-
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1.0">
-
-<title>Projek CRUD Wisata</title>
-
-<link
-rel="stylesheet"
-href="assets/css/style.css">
+<title>Rinjani Guide</title>
 
 <style>
 
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+html,
+body{
+    width:100%;
+    min-height:100vh;
+}
+
+body{
+    background:#000;
+}
+
 .hero{
+    position:relative;
+    width:100%;
+    min-height:100vh;
 
-background:
-linear-gradient(
-rgba(15,23,42,0.75),
-rgba(15,23,42,0.75)
-),
+    background:
+        linear-gradient(
+            rgba(0,0,0,.45),
+            rgba(0,0,0,.45)
+        ),
+        url('upload/rinjani2.jpg');
 
-url('assets/img/hero.jpg');
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
 
-background-size:cover;
-background-position:center;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
 
-color:white;
-
-text-align:center;
-
-padding:140px 20px;
-
+    padding:20px;
 }
 
-.hero h1{
+.content{
+    width:100%;
+    max-width:900px;
 
-font-size:52px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
 
-margin-bottom:18px;
+    color:#fff;
 
+    z-index:2;
 }
 
-.hero p{
-
-font-size:18px;
-
-margin-bottom:35px;
-
-max-width:750px;
-
-margin-left:auto;
-margin-right:auto;
-
-line-height:1.7;
-
+.logo{
+    width:320px;
+    max-width:90%;
+    margin-bottom:25px;
 }
 
-.hero-btn{
+.badge{
+    display:inline-block;
 
-display:flex;
+    background:rgba(46,164,79,.95);
 
-justify-content:center;
+    color:#fff;
 
-gap:15px;
+    padding:12px 25px;
 
-flex-wrap:wrap;
+    border-radius:50px;
 
+    font-size:16px;
+
+    margin-bottom:30px;
 }
 
-.container{
-
-width:92%;
-
-margin:auto;
-
+.title-1{
+    font-size:70px;
+    font-weight:700;
+    line-height:1.1;
+    margin-bottom:8px;
 }
 
-.section-title{
-
-text-align:center;
-
-margin:60px 0 40px;
-
-}
-
-.section-title h2{
-
-font-size:38px;
-
-color:#1e293b;
-
-margin-bottom:10px;
-
-}
-
-.section-title p{
-
-color:#64748b;
-
-}
-
-.destinasi-grid{
-
-display:grid;
-
-grid-template-columns:
-repeat(auto-fit,minmax(300px,1fr));
-
-gap:30px;
-
-margin-bottom:70px;
-
-}
-
-.card-destinasi{
-
-background:white;
-
-border-radius:22px;
-
-overflow:hidden;
-
-box-shadow:
-0 10px 30px rgba(0,0,0,0.08);
-
-transition:.35s;
-
-}
-
-.card-destinasi:hover{
-
-transform:translateY(-10px);
-
-}
-
-.card-destinasi img{
-
-width:100%;
-
-height:240px;
-
-object-fit:cover;
-
-}
-
-.card-body{
-
-padding:25px;
-
-}
-
-.card-body h3{
-
-color:#1e293b;
-
-margin-bottom:12px;
-
-font-size:24px;
-
-}
-
-.lokasi{
-
-color:#3b82f6;
-
-font-weight:bold;
-
-margin-bottom:10px;
-
-}
-
-.harga{
-
-font-size:22px;
-
-font-weight:bold;
-
-color:#22c55e;
-
-margin-bottom:15px;
-
+.title-2{
+    font-size:55px;
+    font-weight:600;
+    line-height:1.2;
+    margin-bottom:25px;
 }
 
 .desc{
+    max-width:750px;
 
-color:#64748b;
+    font-size:22px;
+    line-height:1.8;
 
-line-height:1.7;
+    color:#f8fafc;
 
-margin-bottom:22px;
-
+    margin-bottom:40px;
 }
 
-.footer{
+.btn-login{
+    display:inline-flex;
 
-background:#1e293b;
+    justify-content:center;
+    align-items:center;
 
-color:white;
+    min-width:220px;
 
-text-align:center;
+    text-decoration:none;
 
-padding:35px;
+    background:#2ea44f;
 
-margin-top:50px;
+    color:#fff;
 
+    padding:18px 55px;
+
+    border-radius:12px;
+
+    font-size:20px;
+
+    font-weight:600;
+
+    transition:.3s ease;
+}
+
+.btn-login:hover{
+    background:#238636;
+    transform:translateY(-3px);
 }
 
 @media(max-width:768px){
 
-.hero h1{
+    .logo{
+        width:220px;
+    }
 
-font-size:36px;
+    .badge{
+        font-size:14px;
+        padding:10px 20px;
+    }
 
-}
+    .title-1{
+        font-size:42px;
+    }
 
-.hero{
+    .title-2{
+        font-size:32px;
+    }
 
-padding:100px 20px;
+    .desc{
+        font-size:16px;
+        line-height:1.7;
+    }
 
-}
-
+    .btn-login{
+        min-width:180px;
+        padding:14px 35px;
+        font-size:18px;
+    }
 }
 
 </style>
-
 </head>
-
 <body>
 
-<nav class="navbar">
+<section class="hero">
 
-<div class="logo">
+    <div class="content">
 
-TRAVEL GUIDE
+        <img
+            src="upload/logo.png"
+            alt="Rinjani Guide"
+            class="logo">
 
-</div>
+        <div class="badge">
+            Jelajahi Keindahan Alam Sembalun
+        </div>
 
-<ul>
+        <h1 class="title-1">
+            Pendakian Aman,
+        </h1>
 
-<li>
+        <h2 class="title-2">
+            Pengalaman Tak Terlupakan
+        </h2>
 
-<a href="#beranda">
+        <p class="desc">
+            Bersama guide lokal berpengalaman,
+            nikmati petualangan terbaik di setiap
+            puncak Gunung Rinjani.
+        </p>
 
-Beranda
+        <a href="login.php" class="btn-login">
+            Login
+        </a>
 
-</a>
-
-</li>
-
-<li>
-
-<a href="#destinasi">
-
-Destinasi
-
-</a>
-
-</li>
-
-<li>
-
-<a href="login.php">
-
-Login
-
-</a>
-
-</li>
-
-<li>
-
-<a href="register.php">
-
-Register
-
-</a>
-
-</li>
-
-</ul>
-
-</nav>
-
-<section
-class="hero"
-id="beranda">
-
-<h1>
-
-Temukan Wisata Terbaik Anda
-
-</h1>
-
-<p>
-
-Booking destinasi wisata favorit,
-dapatkan pengalaman perjalanan
-lebih mudah bersama guide profesional.
-
-</p>
-
-<div class="hero-btn">
-
-<a
-href="login.php"
-class="btn btn-primary">
-
-LOGIN
-
-</a>
-
-<a
-href="register.php"
-class="btn btn-warning">
-
-REGISTER
-
-</a>
-
-</div>
+    </div>
 
 </section>
-
-<div
-class="container"
-id="destinasi">
-
-<div class="section-title">
-
-<h2>
-
-Destinasi Wisata
-
-</h2>
-
-<p>
-
-Jelajahi pilihan wisata terbaik.
-
-</p>
-
-</div>
-
-<div class="destinasi-grid">
-
-<?php
-
-if(
-mysqli_num_rows($query)>0
-){
-
-while(
-$row=mysqli_fetch_assoc($query)
-){
-
-?>
-
-<div class="card-destinasi">
-
-<?php
-
-$gambar =
-!empty($row['gambar'])
-
-?
-
-'uploads/'.$row['gambar']
-
-:
-
-'https://via.placeholder.com/600x400';
-
-?>
-
-<img
-src="<?= $gambar ?>">
-
-<div class="card-body">
-
-<h3>
-
-<?= htmlspecialchars(
-$row['nama_destinasi']
-) ?>
-
-</h3>
-
-<div class="lokasi">
-
-📍
-<?= htmlspecialchars(
-$row['lokasi']
-) ?>
-
-</div>
-
-<div class="harga">
-
-Rp
-<?= number_format(
-$row['harga'],
-0,
-',',
-'.'
-) ?>
-
-</div>
-
-<div class="desc">
-
-<?= substr(
-htmlspecialchars(
-$row['deskripsi']
-),
-0,
-120
-) ?>
-
-...
-
-</div>
-
-<a
-href="login.php"
-class="btn btn-primary">
-
-Booking Sekarang
-
-</a>
-
-</div>
-
-</div>
-
-<?php
-
-}
-
-}else{
-
-?>
-
-<div class="card">
-
-<h3>
-
-Belum ada destinasi tersedia.
-
-</h3>
-
-</div>
-
-<?php
-
-}
-
-?>
-
-</div>
-
-</div>
-
-<footer class="footer">
-
-<h3>
-
-TRAVEL GUIDE SYSTEM
-
-</h3>
-
-<p>
-
-© 2026 Projek CRUD Wisata.
-
-</p>
-
-</footer>
-
-<script
-src="assets/js/script.js">
-
-</script>
 
 </body>
 </html>

@@ -9,7 +9,7 @@ $destinations = [
         "difficulty_class" => "sulit",
         "duration" => "2 - 3 Hari",
         "price" => "Mulai Rp 300.000",
-        "image" => "../upload/6a193065f14f2_destinasi.png",
+        "image" => "../upload/6a1e97f50240c_destinasi.png",
     ],
     [
         "name" => "Bukit Pergasingan",
@@ -853,7 +853,7 @@ $why_us = [
         <div class="hero-actions">
             <a href="paket.php" class="btn-primary">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                Lihat Paket
+                Lihat Destinasi
             </a>
             <a href="tentang.php" class="btn-secondary">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
