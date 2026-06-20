@@ -31,7 +31,7 @@ if ($action === 'back') {
 // Lanjut ke pembayaran
 if ($action === 'confirm') {
     // Simpan booking ke DB
-    $kode      = 'RG-' . strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 8));
+    $user_id   = (int)($_SESSION['id'] ?? 0);
     $dest_id   = (int)$form['dest_id'];
     $tanggal   = mysqli_real_escape_string($koneksi, $form['tanggal']);
     $peserta   = (int)$form['peserta'];
@@ -44,10 +44,14 @@ if ($action === 'confirm') {
                 (user_id, destinasi_id, tanggal, jumlah_orang,
                  nama_customer, whatsapp, catatan, total_harga, status)
             VALUES
-                ('$kode', $dest_id, '$tanggal', $peserta,
+                ($user_id, $dest_id, '$tanggal', $peserta,
                  '$nama', '$wa', '$catatan', $total_esc, 'pending')";
 
     if (mysqli_query($koneksi, $sql)) {
+        // Gunakan id auto-increment asli sebagai kode booking,
+        // supaya cocok dengan kolom 'id' saat dicari di pembayaran.php & sukses.php
+        $kode = (string) mysqli_insert_id($koneksi);
+
         $_SESSION['booking_kode']  = $kode;
         $_SESSION['booking_step']  = 3;
         header('Location: pembayaran.php');

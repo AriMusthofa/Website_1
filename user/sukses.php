@@ -17,13 +17,19 @@ if (empty($kode)) {
 // ── Ambil data booking dari DB ────────────────────────────────
 $kode_esc = mysqli_real_escape_string($koneksi, $kode);
 $result   = mysqli_query($koneksi,
-    "SELECT b.*, d.name AS dest_name, d.duration, d.difficulty
+    "SELECT b.*, d.name AS dest_name
      FROM   booking b
      LEFT   JOIN destinasi d ON d.id = b.destinasi_id
      WHERE  b.id = '$kode_esc'
      LIMIT  1");
 
-$booking = $result ? mysqli_fetch_assoc($result) : null;
+// Jika query gagal (error SQL), jangan fatal — tampilkan pesan & log saja
+if ($result === false) {
+    error_log('sukses.php query error: ' . mysqli_error($koneksi));
+    $booking = null;
+} else {
+    $booking = mysqli_fetch_assoc($result);
+}
 
 // Jika kode tidak ditemukan, redirect
 if (!$booking) {
@@ -289,7 +295,7 @@ function tglIndo($t) {
     <div class="nav-logo">
         <a href="beranda.php">
             <?php
-            $lpaths = ['../assets/images/logo.png','../assets/logo.png','../images/logo.png'];
+            $lpaths = ['../upload/logohitam.png','../upload/logohitam.png','../upload/logohitam.png'];
             $lf = '';
             foreach ($lpaths as $lp) { if (file_exists($lp)) { $lf = $lp; break; } }
             ?>
@@ -358,7 +364,7 @@ function tglIndo($t) {
                 <line x1="8"  y1="2" x2="8"  y2="6"/>
                 <line x1="3"  y1="10" x2="21" y2="10"/>
             </svg>
-            Kode Booking:&nbsp;<strong id="kodeText"><?= htmlspecialchars($kode) ?></strong>
+            Kode Booking:&nbsp;<strong id="kodeText">RG-<?= htmlspecialchars(str_pad($kode, 6, '0', STR_PAD_LEFT)) ?></strong>
             <button class="btn-kode-copy" id="btnKodeCopy" title="Salin kode">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                     <rect x="9" y="9" width="13" height="13" rx="2"/>
@@ -390,11 +396,11 @@ function tglIndo($t) {
                 </div>
                 <div class="det-item">
                     <span class="det-lbl">Tanggal Pendakian</span>
-                    <span class="det-val"><?= tglIndo($booking['tanggal_pendakian'] ?? '') ?></span>
+                    <span class="det-val"><?= tglIndo($booking['tanggal'] ?? '') ?></span>
                 </div>
                 <div class="det-item">
                     <span class="det-lbl">Jumlah Peserta</span>
-                    <span class="det-val"><?= (int)($booking['jumlah_peserta'] ?? 1) ?> Orang</span>
+                    <span class="det-val"><?= (int)($booking['jumlah_orang'] ?? 1) ?> Orang</span>
                 </div>
                 <div class="det-item">
                     <span class="det-lbl">Metode Pembayaran</span>
@@ -402,12 +408,18 @@ function tglIndo($t) {
                 </div>
                 <div class="det-item">
                     <span class="det-lbl">Nama Lengkap</span>
-                    <span class="det-val"><?= htmlspecialchars($booking['nama_lengkap'] ?? '—') ?></span>
+                    <span class="det-val"><?= htmlspecialchars($booking['nama_customer'] ?? '—') ?></span>
                 </div>
                 <div class="det-item">
                     <span class="det-lbl">No. WhatsApp</span>
-                    <span class="det-val"><?= htmlspecialchars($booking['no_wa'] ?? '—') ?></span>
+                    <span class="det-val"><?= htmlspecialchars($booking['whatsapp'] ?? '—') ?></span>
                 </div>
+                <?php if (!empty($booking['catatan'])): ?>
+                <div class="det-item full">
+                    <span class="det-lbl">Catatan</span>
+                    <span class="det-val"><?= nl2br(htmlspecialchars($booking['catatan'])) ?></span>
+                </div>
+                <?php endif; ?>
                 <div class="det-item full">
                     <span class="det-lbl">Total Pembayaran</span>
                     <span class="det-val green"><?= rupiah($booking['total_harga'] ?? 0) ?></span>
@@ -457,7 +469,7 @@ function tglIndo($t) {
                 <line x1="12" y1="8" x2="12" y2="12"/>
                 <line x1="12" y1="16" x2="12.01" y2="16"/>
             </svg>
-            <span>Simpan kode booking <strong><?= htmlspecialchars($kode) ?></strong> sebagai referensi. Hubungi kami di WhatsApp jika ada pertanyaan terkait pesanan Anda.</span>
+            <span>Simpan kode booking <strong>RG-<?= htmlspecialchars(str_pad($kode, 6, '0', STR_PAD_LEFT)) ?></strong> sebagai referensi. Hubungi kami di WhatsApp jika ada pertanyaan terkait pesanan Anda.</span>
         </div>
 
         <!-- Tombol Aksi -->

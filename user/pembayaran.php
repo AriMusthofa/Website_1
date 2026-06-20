@@ -3,6 +3,7 @@
 //  Rinjani Guide — pembayaran.php  (folder: user/)
 //  Step 3 dari 3: Pembayaran
 // ============================================================
+ob_start(); // pastikan header() selalu bisa jalan walau ada output tak sengaja
 session_start();
 
 // ── Guard: wajib dari konfirmasi.php ─────────────────────────
@@ -105,7 +106,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['booking_step']
         );
 
+        if (ob_get_level() > 0) { ob_end_clean(); }
         header('Location: sukses.php?kode=' . urlencode($kode));
+        echo '<script>window.location.href="sukses.php?kode=' . urlencode($kode) . '";</script>';
+        echo '<noscript><meta http-equiv="refresh" content="0;url=sukses.php?kode=' . urlencode($kode) . '"></noscript>';
         exit;
     }
 
@@ -166,7 +170,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['booking_step']
                 );
 
+                if (ob_get_level() > 0) { ob_end_clean(); }
                 header('Location: sukses.php?kode='.urlencode($kode));
+                echo '<script>window.location.href="sukses.php?kode=' . urlencode($kode) . '";</script>';
+                echo '<noscript><meta http-equiv="refresh" content="0;url=sukses.php?kode=' . urlencode($kode) . '"></noscript>';
                 exit;
             }
             else{
