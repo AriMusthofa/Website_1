@@ -13,9 +13,48 @@ if(isset($_POST['assign'])){
     $booking_id = intval($_POST['booking_id'] ?? 0);
     $guide_id   = intval($_POST['guide_id']);
 
-    $cek_status = mysqli_query($koneksi, "SELECT status FROM booking WHERE id='$booking_id' LIMIT 1");
+    // Ambil status & tanggal booking yang akan di-assign
+    $cek_status = mysqli_query($koneksi, "SELECT status, tanggal FROM booking WHERE id='$booking_id' LIMIT 1");
     $row_status = mysqli_fetch_assoc($cek_status);
+
+    // Booking ini sudah diterima guide -> terkunci, tidak boleh diubah lagi
     if($row_status && $row_status['status'] == 'Diterima Guide'){
+        header("Location: booking.php");
+        exit();
+    }
+
+    $booking_tanggal_assign = $row_status['tanggal'] ?? '';
+
+    // ── Validasi server-side: pastikan guide yang dipilih benar-benar
+    //    tersedia di tanggal ini, agar tidak bisa di-bypass lewat request
+    //    POST langsung (di luar tampilan <select> yang sudah men-disable
+    //    opsi guide yang sibuk).
+    $guide_tersedia = true;
+
+    if(!empty($booking_tanggal_assign) && $guide_id > 0){
+        $cek_busy = mysqli_query($koneksi,
+            "SELECT id, status FROM booking
+             WHERE guide_id = '$guide_id'
+             AND tanggal = '".mysqli_real_escape_string($koneksi, $booking_tanggal_assign)."'
+             AND status IN ('Diterima Guide','Guide Ditugaskan','Guide Menolak')"
+        );
+
+        while($busy_row = mysqli_fetch_assoc($cek_busy)){
+            if($busy_row['status'] == 'Guide Menolak' && (int)$busy_row['id'] == $booking_id){
+                // Guide sudah menolak booking INI -> tidak boleh dipilih ulang
+                $guide_tersedia = false;
+                break;
+            }
+            if($busy_row['status'] != 'Guide Menolak' && (int)$busy_row['id'] != $booking_id){
+                // Guide sedang Diterima/Ditugaskan di booking LAIN, tanggal sama
+                $guide_tersedia = false;
+                break;
+            }
+        }
+    }
+
+    if(!$guide_tersedia){
+        // Guide tidak tersedia -> batalkan assign, jangan ubah apapun
         header("Location: booking.php");
         exit();
     }
@@ -36,7 +75,26 @@ if(isset($_POST['assign'])){
 /* ========================= LOAD GUIDE ========================= */
 $data_guide = mysqli_query($koneksi, "SELECT * FROM users WHERE role='guide' ORDER BY nama ASC");
 
-/* ========================= LOAD BUSY GUIDES PER DATE ========================= */
+/* =========================================================
+   LOAD BUSY GUIDES PER TANGGAL
+
+   Aturan ketersediaan guide (per TANGGAL booking, tanpa peduli destinasi):
+
+   - 'Diterima Guide'   => guide SUDAH MENERIMA booking lain di tanggal ini
+                           => TERKUNCI (tidak bisa dipilih) untuk booking LAIN
+                              di tanggal yang sama
+   - 'Guide Ditugaskan' => guide sedang DITUGASKAN/menunggu respon untuk
+                           booking lain di tanggal ini
+                           => TERKUNCI (tidak bisa dipilih) untuk booking LAIN
+                              di tanggal yang sama
+   - 'Guide Menolak'    => guide sudah MENOLAK booking INI (booking yang
+                           sedang dilihat admin sekarang)
+                           => TERKUNCI khusus untuk booking itu sendiri,
+                              tidak bisa dipilih ulang untuk booking yang sama
+   - 'Menunggu Guide'   => status bebas/netral; SENGAJA tidak dimasukkan ke
+                           query di bawah ini, sehingga guide dengan status
+                           ini TETAP BISA dipilih/di-reassign oleh admin
+   ========================================================= */
 $busy_guides_by_date = [];
 $busy_query = mysqli_query($koneksi,
     "SELECT guide_id, tanggal, id AS booking_id, status
@@ -331,23 +389,42 @@ if(mysqli_num_rows($query) > 0){
             mysqli_data_seek($data_guide, 0);
             $booking_tanggal = $row['tanggal'];
             while($g = mysqli_fetch_assoc($data_guide)){
-                $is_busy = false; $busy_status = '';
+
+                $is_busy     = false;
+                $busy_status = '';
+
+                // Cek apakah guide ini punya jadwal di TANGGAL yang sama
+                // (tidak peduli destinasi booking lain)
                 if(!empty($booking_tanggal) && isset($busy_guides_by_date[$booking_tanggal][$g['id']])){
+
                     $entry      = $busy_guides_by_date[$booking_tanggal][$g['id']];
                     $entry_stat = $entry['status'];
                     $entry_bid  = $entry['booking_id'];
+
                     if($entry_stat == 'Guide Menolak' && $entry_bid == $row['id']){
-                        $is_busy = true; $busy_status = 'Guide Menolak';
+                        // Guide menolak BOOKING INI SENDIRI -> terkunci khusus booking ini
+                        $is_busy     = true;
+                        $busy_status = 'Guide Menolak';
+
                     } elseif($entry_stat != 'Guide Menolak' && $entry_bid != $row['id']){
-                        $is_busy = true; $busy_status = $entry_stat;
+                        // Guide sedang "Diterima Guide" / "Guide Ditugaskan"
+                        // pada BOOKING LAIN di tanggal yang sama -> terkunci
+                        $is_busy     = true;
+                        $busy_status = $entry_stat;
                     }
+                    // Catatan: status 'Menunggu Guide' tidak pernah masuk ke
+                    // $busy_guides_by_date (lihat query di atas), jadi guide
+                    // dengan status itu SELALU tetap bisa dipilih/di-reassign.
                 }
+
                 $is_selected = ($row['guide_id'] == $g['id']);
+
                 if($is_busy){
                     if($busy_status == 'Guide Menolak')       $ket = ' (Menolak)';
                     elseif($busy_status == 'Diterima Guide')  $ket = ' (Sedang Bertugas)';
                     else                                      $ket = ' (Menunggu Konfirmasi)';
                 } else { $ket = ''; }
+
                 echo "<option value=\"".intval($g['id'])."\""
                    . ($is_selected ? ' selected' : '')
                    . ($is_busy ? ' disabled style="color:#9ca3af;"' : '')
