@@ -62,11 +62,11 @@ $why_us = [
 ];
 
 $team = [
-    ["name" => "Sulaiman",    "role" => "Lead Guide & Founder",      "exp" => "5 tahun pengalaman", "img" => "../upload/Sulaiman.jpg"],
-    ["name" => "Putra Jaya",   "role" => "Senior Mountain Guide",        "exp" => "3 tahun pengalaman",  "img" => "../upload/putra.jpg"],
-    ["name" => "Sataruddin",    "role" => "Operations Manage",     "exp" => "2 tahun pengalaman", "img" => "../upload/satar.jpg"],
-    ["name" => "Ari Musthofa", "role" => "Safety & Equipment Officer","exp" => "2 tahun pengalaman",  "img" => "../upload/ari.jpg"],
-    ["name" => "Zahid Faruqi", "role" => "Trail & Logistics Guide",   "exp" => "1 tahun pengalaman",  "img" => "../upload/Faruq.jpg"],
+    ["name" => "Sulaiman",    "role" => "Lead Guide & Founder",      "exp" => "5 tahun pengalaman", "img" => "../upload/sulaiman.jpg"],
+    ["name" => "Putra Jaya",   "role" => "Senior Mountain Guide",        "exp" => "3 tahun pengalaman",  "img" => "../upload/Putra.jpg"],
+    ["name" => "Sataruddin",    "role" => "Operations Manage",     "exp" => "2 tahun pengalaman", "img" => "../upload/Satar.jpg"],
+    ["name" => "Ari Musthofa", "role" => "Safety & Equipment Officer","exp" => "2 tahun pengalaman",  "img" => "../upload/Ari.jpg"],
+    ["name" => "Zahid Faruqi", "role" => "Trail & Logistics Guide",   "exp" => "1 tahun pengalaman",  "img" => "../upload/faruq.jpg"],
 ];
 ?>
 <!DOCTYPE html>
