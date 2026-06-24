@@ -1250,8 +1250,8 @@ $filtered = array_filter($pakets, function ($p) use ($active_filter) {
                 </div>
                 <select class="sort-select" id="sortSelect">
                     <option value="default">Urutan Default</option>
-                    <option value="price-asc">Harga: Terendah</option>
-                    <option value="price-desc">Harga: Tertinggi</option>
+                    <option value="price-asc">Harga Terendah</option>
+                    <option value="price-desc">Harga Tertinggi</option>
                     <option value="name-asc">Nama: A–Z</option>
                     <option value="altitude-desc">Ketinggian Tertinggi</option>
                 </select>

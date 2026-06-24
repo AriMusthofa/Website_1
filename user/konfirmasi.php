@@ -361,7 +361,7 @@ function tglIndo($tgl) {
     <div class="nav-logo">
         <a href="beranda.php">
             <?php
-            $logo_paths = ['../assets/images/logo.png','../assets/logo.png','../images/logo.png'];
+            $logo_paths = ['../upload/logohitam.png','../upload/logohitam.png','../logohitam.png'];
             $logo_found = '';
             foreach ($logo_paths as $lp) { if (file_exists($lp)) { $logo_found = $lp; break; } }
             ?>

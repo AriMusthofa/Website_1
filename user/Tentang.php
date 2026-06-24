@@ -63,10 +63,10 @@ $why_us = [
 
 $team = [
     ["name" => "Sulaiman",    "role" => "Lead Guide & Founder",      "exp" => "5 tahun pengalaman", "img" => "../upload/sulaiman.jpg"],
-    ["name" => "Putra Jaya",   "role" => "Senior Mountain Guide",        "exp" => "3 tahun pengalaman",  "img" => "../upload/Putra.jpg"],
+    ["name" => "Putra Jaya",   "role" => "Senior Mountain Guide",        "exp" => "4 tahun pengalaman",  "img" => "../upload/Putra.jpg"],
     ["name" => "Sataruddin",    "role" => "Operations Manage",     "exp" => "2 tahun pengalaman", "img" => "../upload/Satar.jpg"],
-    ["name" => "Ari Musthofa", "role" => "Safety & Equipment Officer","exp" => "2 tahun pengalaman",  "img" => "../upload/Ari.jpg"],
-    ["name" => "Zahid Faruqi", "role" => "Trail & Logistics Guide",   "exp" => "1 tahun pengalaman",  "img" => "../upload/faruq.jpg"],
+    ["name" => "Ari Musthofa", "role" => "Safety & Equipment Officer","exp" => "3 tahun pengalaman",  "img" => "../upload/Ari.jpg"],
+    ["name" => "Zahid Faruqi", "role" => "Trail & Logistics Guide",   "exp" => "3 tahun pengalaman",  "img" => "../upload/faruq.jpg"],
 ];
 ?>
 <!DOCTYPE html>
@@ -790,7 +790,7 @@ $team = [
                 </div>
                 <div class="img-badge-text">
                     <div class="num">3.726</div>
-                    <div class="lbl">MDPL — Puncak Rinjani</div>
+                    <div class="lbl">MDPL — Dewi Anjani</div>
                 </div>
             </div>
         </div>

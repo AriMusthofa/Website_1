@@ -409,9 +409,9 @@ function hargaNum($d) { return (int)($d['price_num'] ?? 0); }
 <!-- ━━ NAVBAR -->
 <nav class="navbar" id="navbar">
     <div class="nav-logo">
-        <a href="../upload/logo.php">
-            <?php if (file_exists('../upload/logo.png')): ?>
-                <img src="../upload/logo.png" alt="Rinjani Guide">
+        <a href="../upload/logohitam.png">
+            <?php if (file_exists('../upload/logohitam.png')): ?>
+                <img src="../upload/logohitam.png" alt="Rinjani Guide">
             <?php else: ?>
                 <div class="lph">LOGO HERE</div>
             <?php endif; ?>
