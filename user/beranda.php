@@ -994,7 +994,7 @@ $why_us = [
             [
                 "text"   => "Ini pertama kali saya mendaki dan saya pilih Rinjani Guide. Keputusan terbaik! Guidenya sabar banget nemenin saya sampai puncak. Terima kasih!",
                 "name"   => "Neza Khulaifia",
-                "role"   => "Pendaki Pemula dari Lombok Utara",
+                "role"   => "Pendaki dari Lombok Utara",
                 "init"   => "BS",
                 "stars"  => 5,
             ],
@@ -1071,7 +1071,7 @@ $why_us = [
             <div class="footer-heading">Destinasi</div>
             <ul class="footer-links">
                 <?php foreach ($destinations as $d): ?>
-                <li><a href="#"><?= htmlspecialchars($d['name']) ?></a></li>
+                <li><a href="beranda.php#destinations"><?= htmlspecialchars($d['name']) ?></a></li>
                 <?php endforeach; ?>
                 <li><a href="paket.php">Semua Destinasi →</a></li>
             </ul>
