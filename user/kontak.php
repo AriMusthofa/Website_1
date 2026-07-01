@@ -9,7 +9,7 @@ $contacts = [
     [
         "type"    => "phone",
         "title"   => "Telepon",
-        "desc"    => "Hubungi kami melalui telepon",
+        "desc"    => "Hubungi kami melalui nomor telepon",
         "value"   => "+62 831-2965-0994",
         "href"    => "tel:+6283129650994",
         "color"   => "#25a85a",
@@ -18,7 +18,7 @@ $contacts = [
     [
         "type"    => "whatsapp",
         "title"   => "WhatsApp",
-        "desc"    => "Chat kami langsung di WhatsApp",
+        "desc"    => "Chat kami langsung melalui WhatsApp",
         "value"   => "+62 831-2965-0994",
         "href"    => "https://wa.me/qr/OBEVYAVI5YMFM1",
         "color"   => "#25d366",
@@ -27,7 +27,7 @@ $contacts = [
     [
         "type"    => "instagram",
         "title"   => "Instagram",
-        "desc"    => "Follow kami di Instagram",
+        "desc"    => "Follow dan pantau kami di Instagram",
         "value"   => "@rinjaniguide",
         "href"    => "https://www.instagram.com/btn_gn_rinjani?igsh=cW1nMWkzc3Zxa2Qw",
         "color"   => "#e1306c",
@@ -36,7 +36,7 @@ $contacts = [
     [
         "type"    => "facebook",
         "title"   => "Facebook",
-        "desc"    => "Like & follow halaman kami",
+        "desc"    => "Like & follow halaman facebook kami",
         "value"   => "Rinjani Guide",
         "href"    => "https://www.facebook.com/share/1Awdjmqzyv/",
         "color"   => "#1877f2",
@@ -45,7 +45,7 @@ $contacts = [
     [
         "type"    => "tiktok",
         "title"   => "TikTok",
-        "desc"    => "Tonton konten kami di TikTok",
+        "desc"    => "Follow dan tonton konten kami di TikTok",
         "value"   => "@rinjaniguide",
         "href"    => "https://www.tiktok.com/@btn_gn_rinjani?_r=1&_t=ZS-96rwnoZfONx",
         "color"   => "#010101",
@@ -54,7 +54,7 @@ $contacts = [
     [
         "type"    => "email",
         "title"   => "Email",
-        "desc"    => "Kirim email kepada kami",
+        "desc"    => "Kirim melalui email kami",
         "value"   => "info@rinjaniguide.com",
         "href"    => "mailto:info@rinjaniguide.com",
         "color"   => "#3a8c5c",
