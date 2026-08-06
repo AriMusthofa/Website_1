@@ -330,7 +330,7 @@ if(isset($_POST['update'])){
     $price_num   = intval($_POST['price_num']);
     $popular     = isset($_POST['popular']) ? 1 : 0;
 
-    $gambar_old  = $_POST['gambar_lama'];
+    $gambar_old   = $_POST['gambar_lama'];
     $gambar_final = $gambar_old;
 
     if(isset($_FILES['image']) && $_FILES['image']['error']==0){
@@ -347,15 +347,15 @@ if(isset($_POST['update'])){
 
             move_uploaded_file(
                 $_FILES['image']['tmp_name'],
-                "../upload/".$gambar_baru
+                $upload_dir.$gambar_baru
             );
 
             if(
                 !empty($gambar_old)
                 &&
-                file_exists("../upload/".$gambar_old)
+                file_exists($upload_dir.$gambar_old)
             ){
-                unlink("../upload/".$gambar_old);
+                unlink($upload_dir.$gambar_old);
             }
 
             $gambar_final = $gambar_baru;
@@ -389,7 +389,7 @@ if(isset($_POST['update'])){
 
             $stmt,
 
-            "sssssssdsii",
+            "sssssssisii",
 
             $name,
             $altitude,
@@ -421,12 +421,497 @@ if(isset($_POST['update'])){
 <head>
 
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Kelola Destinasi</title>
 
 <link
 rel="stylesheet"
 href="../assets/css/dashboard.css">
+
+<style>
+
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+font-family:Segoe UI,sans-serif;
+}
+
+html,body{
+max-width:100%;
+overflow-x:hidden;
+}
+
+body{
+background:#f1f5f9;
+}
+
+:root{
+--primary:#2563eb;
+--primary2:#1d4ed8;
+--success:#16a34a;
+--danger:#dc2626;
+--bg:#f1f5f9;
+--card:#ffffff;
+--border:#e2e8f0;
+--text:#0f172a;
+--muted:#64748b;
+}
+
+/* LAYOUT */
+
+.layout{
+display:flex;
+min-height:100vh;
+width:100%;
+max-width:100%;
+}
+
+.main-content{
+flex:1;
+min-width:0;
+padding:30px 20px;
+max-width:100%;
+overflow-x:hidden;
+}
+
+/* MAIN */
+
+.container{
+max-width:1450px;
+width:100%;
+margin:auto;
+}
+
+/* CARD */
+
+.card{
+
+background:#fff;
+
+border-radius:24px;
+
+padding:35px;
+
+box-shadow:
+0 15px 40px rgba(15,23,42,.08);
+
+border:1px solid rgba(226,232,240,.8);
+
+margin-bottom:35px;
+
+max-width:100%;
+
+}
+
+/* TITLE */
+
+.card h2{
+
+font-size:28px;
+
+font-weight:700;
+
+color:var(--text);
+
+margin-bottom:30px;
+
+word-break:break-word;
+
+}
+
+/* FORM GRID */
+
+.form-grid{
+
+display:grid;
+
+grid-template-columns:
+repeat(2,1fr);
+
+gap:22px;
+
+width:100%;
+
+}
+
+/* FULL WIDTH */
+
+.full-width{
+
+grid-column:1 / -1;
+
+}
+
+/* GROUP */
+
+.form-group{
+
+display:flex;
+
+flex-direction:column;
+
+min-width:0;
+
+}
+
+/* LABEL */
+
+.form-group label{
+
+font-size:14px;
+
+font-weight:700;
+
+color:#334155;
+
+margin-bottom:10px;
+
+}
+
+/* INPUT */
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+
+width:100%;
+
+max-width:100%;
+
+padding:14px 16px;
+
+border-radius:16px;
+
+border:1px solid var(--border);
+
+background:#f8fafc;
+
+font-size:15px;
+
+transition:.25s ease;
+
+outline:none;
+
+}
+
+/* FOCUS */
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{
+
+border-color:var(--primary);
+
+background:white;
+
+box-shadow:
+0 0 0 4px rgba(37,99,235,.12);
+
+}
+
+/* TEXTAREA */
+
+textarea{
+
+resize:none;
+
+min-height:140px;
+
+}
+
+/* FILE BOX */
+
+.upload-box{
+
+border:2px dashed #cbd5e1;
+
+background:#f8fafc;
+
+padding:28px;
+
+border-radius:22px;
+
+text-align:center;
+
+cursor:pointer;
+
+transition:.25s;
+
+display:block;
+
+}
+
+.upload-box:hover{
+
+border-color:var(--primary);
+
+background:#eff6ff;
+
+}
+
+.upload-box input{
+
+display:none;
+
+}
+
+.upload-icon{
+
+font-size:44px;
+
+margin-bottom:10px;
+
+}
+
+.upload-text{
+
+font-weight:600;
+
+color:#475569;
+
+}
+
+/* PREVIEW */
+
+.preview-wrapper{
+
+margin-top:20px;
+
+display:flex;
+
+justify-content:center;
+
+}
+
+.preview-wrapper img{
+
+max-width:200px;
+
+width:100%;
+
+height:150px;
+
+border-radius:18px;
+
+object-fit:cover;
+
+border:1px solid #e2e8f0;
+
+box-shadow:
+0 10px 25px rgba(0,0,0,.08);
+
+}
+
+/* CHECKBOX */
+
+.checkbox-box{
+
+display:flex;
+
+align-items:center;
+
+gap:12px;
+
+padding-top:18px;
+
+}
+
+.checkbox-box input{
+
+width:20px;
+
+height:20px;
+
+cursor:pointer;
+
+flex-shrink:0;
+
+}
+
+/* BUTTON */
+
+.btn-primary{
+
+margin-top:28px;
+
+border:none;
+
+background:
+linear-gradient(
+135deg,
+#2563eb,
+#1d4ed8
+);
+
+color:white;
+
+padding:16px 28px;
+
+border-radius:18px;
+
+font-size:15px;
+
+font-weight:700;
+
+cursor:pointer;
+
+transition:.25s ease;
+
+box-shadow:
+0 10px 25px rgba(37,99,235,.25);
+
+width:100%;
+
+}
+
+.btn-primary:hover{
+
+transform:translateY(-3px);
+
+box-shadow:
+0 18px 35px rgba(37,99,235,.35);
+
+}
+
+/* TABLE - fit width, no horizontal scroll, wrap text instead */
+
+table{
+
+width:100%;
+
+max-width:100%;
+
+border-collapse:collapse;
+
+table-layout:fixed;
+
+}
+
+table th,
+table td{
+
+word-wrap:break-word;
+
+overflow-wrap:break-word;
+
+font-size:13.5px;
+
+padding:10px 8px;
+
+vertical-align:middle;
+
+text-align:center;
+
+}
+
+table th{
+
+background:#f8fafc;
+
+font-size:13px;
+
+}
+
+table td img{
+
+width:56px;
+
+height:56px;
+
+object-fit:cover;
+
+border-radius:10px;
+
+}
+
+.btn{
+
+display:inline-block;
+
+padding:6px 10px;
+
+border-radius:8px;
+
+font-size:12.5px;
+
+text-decoration:none;
+
+color:white;
+
+margin:2px;
+
+}
+
+.btn-warning{
+background:#f59e0b;
+}
+
+.btn-delete{
+background:var(--danger);
+}
+
+/* RESPONSIVE */
+
+@media(max-width:900px){
+
+.form-grid{
+
+grid-template-columns:1fr;
+
+}
+
+.card{
+
+padding:22px;
+
+}
+
+table th,
+table td{
+
+font-size:12px;
+
+padding:6px 4px;
+
+}
+
+table td img{
+
+width:40px;
+
+height:40px;
+
+}
+
+.btn{
+
+display:block;
+
+margin:4px 0;
+
+}
+
+}
+
+@media(max-width:600px){
+
+.main-content{
+
+padding:16px 10px;
+
+}
+
+.card h2{
+
+font-size:22px;
+
+}
+
+}
+
+</style>
 
 </head>
 
@@ -448,6 +933,14 @@ href="../assets/css/dashboard.css">
 
 </h2>
 
+<?php if(!empty($success)){ ?>
+<p style="color:#16a34a;font-weight:600;margin-bottom:16px;"><?= htmlspecialchars($success) ?></p>
+<?php } ?>
+
+<?php if(!empty($error)){ ?>
+<p style="color:#dc2626;font-weight:600;margin-bottom:16px;"><?= htmlspecialchars($error) ?></p>
+<?php } ?>
+
 <form method="POST" enctype="multipart/form-data">
 
 <input
@@ -465,7 +958,7 @@ value="<?= $id_edit ?>">
 <input
 type="hidden"
 name="gambar_lama"
-value="<?= $gambar_lama ?>">
+value="<?= htmlspecialchars($image) ?>">
 
 <?php } ?>
 
@@ -502,11 +995,11 @@ value="<?= htmlspecialchars($altitude) ?>">
 
 <select name="difficulty">
 
-<option value="Mudah">Mudah</option>
+<option value="Mudah" <?= ($difficulty=='Mudah')?'selected':'' ?>>Mudah</option>
 
-<option value="Menengah">Menengah</option>
+<option value="Menengah" <?= ($difficulty=='Menengah')?'selected':'' ?>>Menengah</option>
 
-<option value="Sulit">Sulit</option>
+<option value="Sulit" <?= ($difficulty=='Sulit')?'selected':'' ?>>Sulit</option>
 
 </select>
 
@@ -605,9 +1098,9 @@ onchange="previewImage(event)">
 id="preview"
 
 src="<?=
-(!empty($image_lama))
+(!empty($image))
 ?
-'../uploads/'.$image_lama
+'../upload/'.htmlspecialchars($image)
 :
 'https://placehold.co/600x400?text=Preview'
 ?>">
@@ -701,341 +1194,13 @@ while($row = mysqli_fetch_assoc($query)){
 <td>
 
 <?php
-if(!empty($row['image'])){
+if(!empty($row['image']) && file_exists($upload_dir.$row['image'])){
 ?>
 
 <img
-src="../uploads/<?= $row['image'] ?>"
-style="
-width:80px;
-height:80px;
-object-fit:cover;
-border-radius:10px;
-">
-<style>
+src="../upload/<?= htmlspecialchars($row['image']) ?>"
+alt="<?= htmlspecialchars($row['name']) ?>">
 
-:root{
---primary:#2563eb;
---primary2:#1d4ed8;
---success:#16a34a;
---danger:#dc2626;
---bg:#f1f5f9;
---card:#ffffff;
---border:#e2e8f0;
---text:#0f172a;
---muted:#64748b;
-}
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Segoe UI,sans-serif;
-}
-
-body{
-background:var(--bg);
-}
-
-/* MAIN */
-
-.container{
-max-width:1450px;
-margin:auto;
-}
-
-/* CARD */
-
-.card{
-
-background:#fff;
-
-border-radius:24px;
-
-padding:35px;
-
-box-shadow:
-0 15px 40px rgba(15,23,42,.08);
-
-border:1px solid rgba(226,232,240,.8);
-
-margin-bottom:35px;
-
-}
-
-/* TITLE */
-
-.card h2{
-
-font-size:30px;
-
-font-weight:700;
-
-color:var(--text);
-
-margin-bottom:30px;
-
-}
-
-/* FORM GRID */
-
-.form-grid{
-
-display:grid;
-
-grid-template-columns:
-repeat(2,1fr);
-
-gap:22px;
-
-}
-
-/* FULL WIDTH */
-
-.full-width{
-
-grid-column:1 / -1;
-
-}
-
-/* GROUP */
-
-.form-group{
-
-display:flex;
-
-flex-direction:column;
-
-}
-
-/* LABEL */
-
-.form-group label{
-
-font-size:14px;
-
-font-weight:700;
-
-color:#334155;
-
-margin-bottom:10px;
-
-}
-
-/* INPUT */
-
-.form-group input,
-.form-group select,
-.form-group textarea{
-
-width:100%;
-
-padding:16px 18px;
-
-border-radius:16px;
-
-border:1px solid var(--border);
-
-background:#f8fafc;
-
-font-size:15px;
-
-transition:.25s ease;
-
-outline:none;
-
-}
-
-/* FOCUS */
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus{
-
-border-color:var(--primary);
-
-background:white;
-
-box-shadow:
-0 0 0 4px rgba(37,99,235,.12);
-
-}
-
-/* TEXTAREA */
-
-textarea{
-
-resize:none;
-
-min-height:140px;
-
-}
-
-/* FILE BOX */
-
-.upload-box{
-
-border:2px dashed #cbd5e1;
-
-background:#f8fafc;
-
-padding:28px;
-
-border-radius:22px;
-
-text-align:center;
-
-cursor:pointer;
-
-transition:.25s;
-
-}
-
-.upload-box:hover{
-
-border-color:var(--primary);
-
-background:#eff6ff;
-
-}
-
-.upload-box input{
-
-display:none;
-
-}
-
-.upload-icon{
-
-font-size:48px;
-
-margin-bottom:10px;
-
-}
-
-.upload-text{
-
-font-weight:600;
-
-color:#475569;
-
-}
-
-/* PREVIEW */
-
-.preview-wrapper{
-
-margin-top:20px;
-
-display:flex;
-
-justify-content:center;
-
-}
-
-.preview-wrapper img{
-
-width:200px;
-
-height:150px;
-
-border-radius:18px;
-
-object-fit:cover;
-
-border:1px solid #e2e8f0;
-
-box-shadow:
-0 10px 25px rgba(0,0,0,.08);
-
-}
-
-/* CHECKBOX */
-
-.checkbox-box{
-
-display:flex;
-
-align-items:center;
-
-gap:12px;
-
-padding-top:18px;
-
-}
-
-.checkbox-box input{
-
-width:20px;
-
-height:20px;
-
-cursor:pointer;
-
-}
-
-/* BUTTON */
-
-.btn-primary{
-
-margin-top:28px;
-
-border:none;
-
-background:
-linear-gradient(
-135deg,
-#2563eb,
-#1d4ed8
-);
-
-color:white;
-
-padding:16px 28px;
-
-border-radius:18px;
-
-font-size:15px;
-
-font-weight:700;
-
-cursor:pointer;
-
-transition:.25s ease;
-
-box-shadow:
-0 10px 25px rgba(37,99,235,.25);
-
-}
-
-.btn-primary:hover{
-
-transform:translateY(-3px);
-
-box-shadow:
-0 18px 35px rgba(37,99,235,.35);
-
-}
-
-/* RESPONSIVE */
-
-@media(max-width:900px){
-
-.form-grid{
-
-grid-template-columns:1fr;
-
-}
-
-.card{
-
-padding:24px;
-
-}
-
-}
-
-</style>
 <?php
 }else{
 echo "-";
@@ -1092,7 +1257,8 @@ Edit
 
 <a
 href="?hapus=<?= $row['id'] ?>&csrf_token=<?= csrf() ?>"
-class="btn btn-delete">
+class="btn btn-delete"
+onclick="return confirm('Yakin hapus destinasi ini?');">
 
 Hapus
 
