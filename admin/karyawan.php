@@ -388,11 +388,24 @@ href="../assets/css/dashboard.css">
 
 <style>
 
+*{
+box-sizing:border-box;
+}
+
+html,body{
+max-width:100%;
+overflow-x:hidden;
+}
+
 .layout{
 
 display:flex;
 
 min-height:100vh;
+
+width:100%;
+
+max-width:100%;
 
 background:#eef2f7;
 
@@ -402,15 +415,21 @@ background:#eef2f7;
 
 flex:1;
 
+min-width:0;
+
+max-width:100%;
+
 padding:35px;
 
-overflow:auto;
+overflow-x:hidden;
 
 }
 
 .container{
 
 width:100%;
+
+max-width:100%;
 
 }
 
@@ -426,6 +445,8 @@ box-shadow:
 0 10px 35px rgba(0,0,0,.08);
 
 margin-bottom:35px;
+
+max-width:100%;
 
 }
 
@@ -555,9 +576,72 @@ background:#dc2626;
 
 .table-wrapper{
 
+width:100%;
+
 overflow-x:auto;
 
 margin-top:15px;
+
+}
+
+.tbl-guide{
+
+width:100%;
+
+max-width:100%;
+
+border-collapse:collapse;
+
+table-layout:fixed;
+
+}
+
+.tbl-guide th,
+.tbl-guide td{
+
+padding:14px 10px;
+
+word-wrap:break-word;
+
+overflow-wrap:break-word;
+
+font-size:14px;
+
+}
+
+/* RESPONSIVE */
+
+@media(max-width:900px){
+
+.main-content{
+
+padding:20px;
+
+}
+
+.card{
+
+padding:22px;
+
+}
+
+.tbl-guide th,
+.tbl-guide td{
+
+font-size:12.5px;
+
+padding:10px 6px;
+
+}
+
+.button-group .btn,
+.tbl-guide .btn{
+
+padding:9px 12px;
+
+font-size:13px;
+
+}
 
 }
 
@@ -706,11 +790,7 @@ DATA GUIDE
 
 <div class="table-wrapper">
 
-<table style="
-width:100%;
-border-collapse:collapse;
-min-width:900px;
-">
+<table class="tbl-guide">
 
 <thead style="
 background:linear-gradient(
@@ -723,17 +803,17 @@ color:white;
 
 <tr>
 
-<th style="padding:18px;">ID</th>
+<th style="width:80px;">Nomor</th>
 
 <th>Nama</th>
 
 <th>Username</th>
 
-<th>Role</th>
+<th style="width:110px;">Role</th>
 
 <th style="
 text-align:center;
-width:220px;
+width:170px;
 ">
 
 Aksi
@@ -770,6 +850,8 @@ mysqli_stmt_get_result($stmt);
 
 if(mysqli_num_rows($query)>0){
 
+$no = 1;
+
 while($row=mysqli_fetch_assoc($query)){
 
 ?>
@@ -779,9 +861,9 @@ border-bottom:1px solid #e5e7eb;
 transition:.2s;
 ">
 
-<td style="padding:18px;">
+<td style="text-align:center;">
 
-<?= $row['id'] ?>
+<?= $no++ ?>
 
 </td>
 
@@ -800,12 +882,14 @@ transition:.2s;
 <td>
 
 <span style="
+display:inline-block;
 background:#fee2e2;
 color:#b91c1c;
 padding:7px 14px;
 border-radius:999px;
 font-size:13px;
 font-weight:700;
+white-space:nowrap;
 ">
 
 <?= ucfirst($row['role']) ?>
@@ -816,13 +900,12 @@ font-weight:700;
 
 <td style="
 text-align:center;
-white-space:nowrap;
 ">
 
 <div style="
 display:flex;
 justify-content:center;
-gap:10px;
+gap:8px;
 flex-wrap:wrap;
 ">
 

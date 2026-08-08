@@ -94,6 +94,8 @@ $koneksi,
 
 booking.id,
 
+booking.tanggal,
+
 booking.nama_customer,
 
 booking.status,
@@ -181,7 +183,7 @@ margin-bottom:24px;
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
 gap:18px;
-margin-bottom:28px;
+margin-bottom:26px;
 width:100%;
 }
 
@@ -207,28 +209,19 @@ font-weight:800;
 color:#0f172a;
 }
 
-/* LAYOUT GRID */
+/* CONTENT CARD */
 
-.layout-grid{
-display:grid;
-grid-template-columns:2fr 1fr;
-gap:22px;
-align-items:start;
-width:100%;
-}
-
-.content-card,
-.right-panel{
+.content-card{
 background:#fff;
 border-radius:16px;
 padding:24px;
 box-shadow:0 8px 24px rgba(15,23,42,.06);
 border:1px solid #e2e8f0;
+width:100%;
 min-width:0;
 }
 
-.content-card h2,
-.right-panel h3{
+.content-card h2{
 font-size:18px;
 font-weight:700;
 color:#0f172a;
@@ -248,54 +241,50 @@ border-collapse:collapse;
 table-layout:fixed;
 }
 
-th,td{
-padding:12px 10px;
+thead tr{
+background:#0f2557;
+}
+
+th{
+color:#cbd5e1;
+font-size:12px;
+text-transform:uppercase;
+letter-spacing:.4px;
+text-align:left;
+padding:14px 12px;
+}
+
+th:first-child{ border-radius:10px 0 0 10px; }
+th:last-child{ border-radius:0 10px 10px 0; }
+
+td{
+padding:14px 12px;
 text-align:left;
 font-size:14px;
+color:#1e293b;
 word-wrap:break-word;
 overflow-wrap:break-word;
 border-bottom:1px solid #eef1f5;
 }
 
-th{
-color:#64748b;
-font-size:12.5px;
-text-transform:uppercase;
-letter-spacing:.4px;
-}
-
-/* RIGHT PANEL LIST */
-
-.right-panel ul{
-list-style:none;
-padding:0;
-margin:0;
-}
-
-.right-panel li{
-display:flex;
-align-items:center;
-gap:10px;
-padding:10px 0;
-font-size:14px;
-color:#334155;
-border-bottom:1px solid #f1f5f9;
-word-break:break-word;
-}
-
-.right-panel li:last-child{
+tbody tr:last-child td{
 border-bottom:none;
 }
 
+.badge-status{
+display:inline-flex;
+align-items:center;
+gap:6px;
+padding:6px 12px;
+border-radius:20px;
+font-size:12.5px;
+font-weight:700;
+background:#dcfce7;
+color:#166534;
+white-space:nowrap;
+}
+
 /* RESPONSIVE */
-
-@media(max-width:1000px){
-
-.layout-grid{
-grid-template-columns:1fr;
-}
-
-}
 
 @media(max-width:600px){
 
@@ -316,9 +305,13 @@ padding:16px 18px;
 font-size:22px;
 }
 
-.content-card,
-.right-panel{
+.content-card{
 padding:18px;
+}
+
+th,td{
+font-size:12.5px;
+padding:10px 8px;
 }
 
 }
@@ -363,15 +356,11 @@ padding:18px;
 
 </div>
 
-<div class="layout-grid">
-
-<!-- LEFT CONTENT -->
-
-<div>
+<!-- PEMESANAN TERBARU -->
 
 <div class="content-card">
 
-<h2>Booking Terbaru</h2>
+<h2>Pemesanan Terbaru</h2>
 
 <div class="table-wrap">
 
@@ -380,8 +369,9 @@ padding:18px;
 <thead>
 
 <tr>
-<th>ID</th>
-<th>Customer</th>
+<th>No</th>
+<th>Tanggal</th>
+<th>Pelanggan</th>
 <th>Destinasi</th>
 <th>Status</th>
 </tr>
@@ -396,12 +386,15 @@ if(
 mysqli_num_rows($q_booking_latest) > 0
 ){
 
+$no = 1;
+
 while($row = mysqli_fetch_assoc($q_booking_latest)){
 
 ?>
 
 <tr>
-<td><?= $row['id'] ?></td>
+<td><?= $no++ ?></td>
+<td><?= !empty($row['tanggal']) ? date('d-m-Y', strtotime($row['tanggal'])) : '-' ?></td>
 <td><?= e($row['nama_customer']) ?></td>
 <td><?= e($row['nama_destinasi'] ?? '-') ?></td>
 <td><?= statusBadge($row['status']) ?></td>
@@ -416,7 +409,7 @@ while($row = mysqli_fetch_assoc($q_booking_latest)){
 ?>
 
 <tr>
-<td colspan="4" style="text-align:center;padding:24px;">Belum ada booking.</td>
+<td colspan="5" style="text-align:center;padding:24px;">Belum ada booking.</td>
 </tr>
 
 <?php
@@ -428,50 +421,6 @@ while($row = mysqli_fetch_assoc($q_booking_latest)){
 </tbody>
 
 </table>
-
-</div>
-
-</div>
-
-</div>
-
-<!-- RIGHT PANEL -->
-
-<div>
-
-<div class="right-panel">
-
-<h3>Aktivitas Cepat</h3>
-
-<ul>
-
-<li>📅 Booking baru masuk</li>
-
-<li>🏔 Tambah destinasi baru</li>
-
-<li>👨‍💼 Kelola guide</li>
-
-<li>👥 Lihat customer</li>
-
-</ul>
-
-</div>
-
-<div class="right-panel" style="margin-top:22px;">
-
-<h3>Admin Info</h3>
-
-<ul>
-
-<li>👤 <?= e($_SESSION['nama'] ?? '-') ?></li>
-
-<li>🛡 Role: Admin</li>
-
-<li>🕒 <?= date('d M Y') ?></li>
-
-</ul>
-
-</div>
 
 </div>
 

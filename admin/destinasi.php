@@ -798,7 +798,7 @@ overflow-wrap:break-word;
 
 font-size:13.5px;
 
-padding:10px 8px;
+padding:12px 8px;
 
 vertical-align:middle;
 
@@ -806,11 +806,34 @@ text-align:center;
 
 }
 
+table thead tr{
+
+background:
+linear-gradient(
+135deg,
+#1e3a8a,
+#1d4ed8
+);
+
+}
+
 table th{
 
-background:#f8fafc;
+color:#ffffff;
 
-font-size:13px;
+font-size:12.5px;
+
+font-weight:700;
+
+text-transform:uppercase;
+
+letter-spacing:.4px;
+
+}
+
+table tbody tr:nth-child(even){
+
+background:#f8fafc;
 
 }
 
@@ -873,7 +896,7 @@ table td{
 
 font-size:12px;
 
-padding:6px 4px;
+padding:8px 4px;
 
 }
 
@@ -978,7 +1001,7 @@ value="<?= htmlspecialchars($name) ?>">
 
 <div class="form-group">
 
-<label>Altitude</label>
+<label>Ketinggian</label>
 
 <input
 type="text"
@@ -991,7 +1014,7 @@ value="<?= htmlspecialchars($altitude) ?>">
 
 <div class="form-group">
 
-<label>Difficulty</label>
+<label>Tingkat Kesulitan</label>
 
 <select name="difficulty">
 
@@ -1007,7 +1030,7 @@ value="<?= htmlspecialchars($altitude) ?>">
 
 <div class="form-group">
 
-<label>Diff Key</label>
+<label>Kode Kesulitan</label>
 
 <input
 type="text"
@@ -1020,7 +1043,7 @@ value="<?= htmlspecialchars($diff_key) ?>">
 
 <div class="form-group">
 
-<label>Duration</label>
+<label>Durasi</label>
 
 <input
 type="text"
@@ -1033,7 +1056,7 @@ value="<?= htmlspecialchars($duration) ?>">
 
 <div class="form-group">
 
-<label>Dur Key</label>
+<label>Kode Durasi</label>
 
 <input
 type="text"
@@ -1046,7 +1069,7 @@ value="<?= htmlspecialchars($dur_key) ?>">
 
 <div class="form-group">
 
-<label>Price</label>
+<label>Harga</label>
 
 <input
 type="text"
@@ -1059,7 +1082,7 @@ value="<?= htmlspecialchars($price) ?>">
 
 <div class="form-group">
 
-<label>Price Number</label>
+<label>Harga (Angka)</label>
 
 <input
 type="number"
@@ -1134,7 +1157,7 @@ $edit
 
 ?
 
-'UPDATE DESTINASI'
+'PERBARUI DESTINASI'
 
 :
 
@@ -1154,19 +1177,25 @@ $edit
 
 <table border="1" cellpadding="10">
 
+<thead>
+
 <tr>
 
-<th>ID</th>
-<th>Image</th>
-<th>Name</th>
-<th>Altitude</th>
-<th>Difficulty</th>
-<th>Duration</th>
-<th>Price</th>
-<th>Popular</th>
+<th>Nomor</th>
+<th>Gambar</th>
+<th>Nama</th>
+<th>Ketinggian</th>
+<th>Kesulitan</th>
+<th>Durasi</th>
+<th>Harga</th>
+<th>Populer</th>
 <th>Aksi</th>
 
 </tr>
+
+</thead>
+
+<tbody>
 
 <?php
 
@@ -1179,6 +1208,8 @@ ORDER BY id DESC"
 
 );
 
+$no = 1;
+
 while($row = mysqli_fetch_assoc($query)){
 
 ?>
@@ -1187,7 +1218,7 @@ while($row = mysqli_fetch_assoc($query)){
 
 <td>
 
-<?= $row['id'] ?>
+<?= $no++ ?>
 
 </td>
 
@@ -1269,6 +1300,8 @@ Hapus
 </tr>
 
 <?php } ?>
+
+</tbody>
 
 </table>
 

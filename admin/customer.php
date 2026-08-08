@@ -380,7 +380,7 @@ Data Customer
 
 <tr>
 
-<th style="width:80px;">ID</th>
+<th style="width:80px;">Nomor</th>
 
 <th>Nama</th>
 
@@ -418,6 +418,8 @@ if(
 mysqli_num_rows($query)>0
 ){
 
+$no = 1;
+
 while(
 $row=
 mysqli_fetch_assoc($query)
@@ -429,7 +431,7 @@ mysqli_fetch_assoc($query)
 
 <td>
 
-<?= $row['id'] ?>
+<?= $no++ ?>
 
 </td>
 
