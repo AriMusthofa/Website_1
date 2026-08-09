@@ -90,29 +90,15 @@ mysqli_query(
 
 $koneksi,
 
-"SELECT
-
-booking.id,
-
-booking.tanggal,
-
-booking.nama_customer,
-
-booking.status,
-
-destinasi.name AS nama_destinasi
+"SELECT booking.*, users.nama AS customer_nama,
+        booking.nama_customer AS booking_customer_nama,
+        destinasi.name AS nama_destinasi
 
 FROM booking
 
-LEFT JOIN destinasi
+LEFT JOIN users ON booking.user_id = users.id
 
-ON
-
-booking.destinasi_id
-
-=
-
-destinasi.id
+LEFT JOIN destinasi ON booking.destinasi_id = destinasi.id
 
 ORDER BY booking.id DESC
 
@@ -153,6 +139,8 @@ box-sizing:border-box;
 html,body{
 max-width:100%;
 overflow-x:hidden;
+margin:0;
+padding:0;
 }
 
 .layout{
@@ -166,15 +154,15 @@ max-width:100%;
 flex:1;
 min-width:0;
 max-width:100%;
-padding:30px;
+padding:22px 24px !important;
 overflow-x:hidden;
 }
 
 .page-title{
-font-size:26px;
+font-size:24px;
 font-weight:700;
 color:#0f172a;
-margin-bottom:24px;
+margin:0 0 16px 0 !important;
 }
 
 /* CARDS */
@@ -182,29 +170,30 @@ margin-bottom:24px;
 .cards{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
-gap:18px;
-margin-bottom:26px;
+gap:16px;
+margin:0 0 16px 0 !important;
 width:100%;
 }
 
 .card{
 background:#fff;
 border-radius:16px;
-padding:22px 24px;
+padding:18px 22px !important;
 box-shadow:0 8px 24px rgba(15,23,42,.06);
 border:1px solid #e2e8f0;
 min-width:0;
+margin:0 !important;
 }
 
 .card-title{
 font-size:13px;
 font-weight:600;
 color:#64748b;
-margin-bottom:8px;
+margin-bottom:6px !important;
 }
 
 .card-value{
-font-size:28px;
+font-size:26px;
 font-weight:800;
 color:#0f172a;
 }
@@ -214,29 +203,31 @@ color:#0f172a;
 .content-card{
 background:#fff;
 border-radius:16px;
-padding:24px;
+padding:20px 22px !important;
 box-shadow:0 8px 24px rgba(15,23,42,.06);
 border:1px solid #e2e8f0;
 width:100%;
 min-width:0;
+margin:0 !important;
 }
 
 .content-card h2{
-font-size:18px;
+font-size:17px;
 font-weight:700;
 color:#0f172a;
-margin-bottom:18px;
+margin:0 0 12px 0 !important;
 }
 
 /* TABLE */
 
 .table-wrap{
 width:100%;
-overflow-x:auto;
+overflow:hidden;
 }
 
 table{
 width:100%;
+max-width:100%;
 border-collapse:collapse;
 table-layout:fixed;
 }
@@ -247,20 +238,20 @@ background:#0f2557;
 
 th{
 color:#cbd5e1;
-font-size:12px;
+font-size:11.5px;
 text-transform:uppercase;
 letter-spacing:.4px;
 text-align:left;
-padding:14px 12px;
+padding:11px 10px !important;
 }
 
 th:first-child{ border-radius:10px 0 0 10px; }
 th:last-child{ border-radius:0 10px 10px 0; }
 
 td{
-padding:14px 12px;
+padding:11px 10px !important;
 text-align:left;
-font-size:14px;
+font-size:13.5px;
 color:#1e293b;
 word-wrap:break-word;
 overflow-wrap:break-word;
@@ -282,6 +273,26 @@ font-weight:700;
 background:#dcfce7;
 color:#166534;
 white-space:nowrap;
+}
+
+.status {
+padding: 7px 13px;
+border-radius: 20px;
+font-size: 12.5px;
+font-weight: 700;
+display: inline-block;
+white-space:nowrap;
+}
+.status-blue   { background: #dbeafe; color: #1d4ed8; }
+.status-green  { background: #dcfce7; color: #166534; }
+.status-red    { background: #fee2e2; color: #991b1b; }
+.status-yellow { background: #fef3c7; color: #92400e; }
+
+.catatan-cell{
+max-width:180px;
+white-space:normal;
+color:#475569;
+font-size:13px;
 }
 
 /* RESPONSIVE */
@@ -310,8 +321,18 @@ padding:18px;
 }
 
 th,td{
-font-size:12.5px;
-padding:10px 8px;
+font-size:11.5px;
+padding:8px 6px;
+}
+
+.status{
+padding:5px 8px;
+font-size:11px;
+}
+
+.catatan-cell{
+max-width:110px;
+font-size:11.5px;
 }
 
 }
@@ -369,11 +390,13 @@ padding:10px 8px;
 <thead>
 
 <tr>
-<th>No</th>
-<th>Tanggal</th>
-<th>Pelanggan</th>
-<th>Destinasi</th>
-<th>Status</th>
+<th style="width:42px;text-align:center;">No</th>
+<th style="width:15%;">Customer</th>
+<th style="width:15%;">Destinasi</th>
+<th style="width:11%;">Tanggal</th>
+<th style="width:9%;">Jumlah</th>
+<th>Catatan</th>
+<th style="width:150px;">Status</th>
 </tr>
 
 </thead>
@@ -390,14 +413,26 @@ $no = 1;
 
 while($row = mysqli_fetch_assoc($q_booking_latest)){
 
+$tampil_customer = !empty($row['customer_nama'])
+    ? $row['customer_nama']
+    : (!empty($row['booking_customer_nama']) ? $row['booking_customer_nama'] : '-');
+
 ?>
 
 <tr>
-<td><?= $no++ ?></td>
-<td><?= !empty($row['tanggal']) ? date('d-m-Y', strtotime($row['tanggal'])) : '-' ?></td>
-<td><?= e($row['nama_customer']) ?></td>
+<td style="text-align:center;"><?= $no++ ?></td>
+<td><?= e($tampil_customer) ?></td>
 <td><?= e($row['nama_destinasi'] ?? '-') ?></td>
-<td><?= statusBadge($row['status']) ?></td>
+<td><?= !empty($row['tanggal']) ? date('d-m-Y', strtotime($row['tanggal'])) : '-' ?></td>
+<td><?= (int)($row['jumlah_orang'] ?? 0) ?> Orang</td>
+<td class="catatan-cell"><?= !empty($row['catatan']) ? e($row['catatan']) : '-' ?></td>
+<td><?php
+    $status = $row['status'];
+    if($status == "Guide Ditugaskan")     echo "<span class='status status-blue'>Guide Ditugaskan</span>";
+    elseif($status == "Diterima Guide")   echo "<span class='status status-green'>Diterima Guide</span>";
+    elseif($status == "Guide Menolak")    echo "<span class='status status-red'>Guide Menolak</span>";
+    else                                  echo "<span class='status status-yellow'>".e($status)."</span>";
+?></td>
 </tr>
 
 <?php
@@ -409,7 +444,7 @@ while($row = mysqli_fetch_assoc($q_booking_latest)){
 ?>
 
 <tr>
-<td colspan="5" style="text-align:center;padding:24px;">Belum ada booking.</td>
+<td colspan="7" style="text-align:center;padding:24px;">Belum ada booking.</td>
 </tr>
 
 <?php

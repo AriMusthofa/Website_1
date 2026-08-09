@@ -8,6 +8,32 @@ if(!isset($_SESSION['role']) || $_SESSION['role'] != 'admin'){
     exit();
 }
 
+/* ========================= VERIFIKASI PEMBAYARAN ========================= */
+if(isset($_POST['verifikasi_bayar'])){
+
+    $booking_id = intval($_POST['booking_id'] ?? 0);
+    $keputusan  = $_POST['keputusan'] ?? '';
+
+    if($booking_id > 0 && in_array($keputusan, ['setuju','tolak'])){
+
+        $nilai = ($keputusan === 'setuju') ? 'setuju' : 'tolak';
+
+        try{
+            $stmt = mysqli_prepare($koneksi, "UPDATE booking SET verifikasi_bayar=? WHERE id=?");
+            mysqli_stmt_bind_param($stmt, "si", $nilai, $booking_id);
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_close($stmt);
+        } catch(mysqli_sql_exception $e){
+            // Kolom verifikasi_bayar belum ada di database.
+            // Jalankan: ALTER TABLE booking ADD COLUMN verifikasi_bayar VARCHAR(20) NOT NULL DEFAULT 'menunggu';
+            $_SESSION['error'] = 'Gagal menyimpan verifikasi: kolom verifikasi_bayar belum ada di database.';
+        }
+    }
+
+    header("Location: booking.php");
+    exit();
+}
+
 /* ========================= ASSIGN GUIDE ========================= */
 if(isset($_POST['assign'])){
     $booking_id = intval($_POST['booking_id'] ?? 0);
@@ -111,6 +137,19 @@ while($busy_row = mysqli_fetch_assoc($busy_query)){
     $busy_guides_by_date[$tgl][$gid] = ['booking_id' => $bid, 'status' => $bstat];
 }
 
+/* ========================= LABEL METODE PEMBAYARAN ========================= */
+$metode_label = [
+    'bca'     => 'BCA',
+    'bri'     => 'BRI',
+    'mandiri' => 'Mandiri',
+    'gopay'   => 'GoPay',
+    'dana'    => 'DANA',
+    'kas'     => 'Tunai (Kas)',
+];
+
+// Folder penyimpanan bukti pembayaran (relatif dari folder admin/)
+$bukti_dir = "../upload/bukti/";
+
 /* ========================= BOOKING SELESAI ========================= */
 $filter_periode = $_GET['periode'] ?? 'semua';
 $today          = date('Y-m-d');
@@ -137,6 +176,10 @@ $q_selesai = mysqli_query($koneksi,
 <link rel="stylesheet" href="../assets/css/dashboard.css">
 <style>
 
+*{ box-sizing:border-box; }
+
+html,body{ max-width:100%; overflow-x:hidden; }
+
 select {
     padding: 12px;
     border: 1px solid #d1d5db;
@@ -159,6 +202,132 @@ select {
 .status-yellow { background: #fef3c7; color: #92400e; }
 
 .table-wrapper { overflow-x: auto; }
+
+.catatan-cell{
+    max-width:220px;
+    white-space:normal;
+    word-break:break-word;
+    font-size:13px;
+    color:#475569;
+}
+
+.btn-lihat-bukti{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:10px 16px;
+    background:#2563eb;
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.2s;
+}
+.btn-lihat-bukti:hover{ background:#1d4ed8; }
+
+/* ===== MODAL BUKTI PEMBAYARAN ===== */
+.modal-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,.55);
+    z-index:1000;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.modal-box{
+    background:#fff;
+    border-radius:20px;
+    padding:28px;
+    max-width:460px;
+    width:100%;
+    max-height:90vh;
+    overflow-y:auto;
+    position:relative;
+    box-shadow:0 20px 50px rgba(0,0,0,.25);
+}
+
+.modal-box h3{
+    font-size:19px;
+    font-weight:700;
+    color:#0f172a;
+    margin-bottom:16px;
+}
+
+.modal-close{
+    position:absolute;
+    top:14px;
+    right:16px;
+    background:none;
+    border:none;
+    font-size:22px;
+    line-height:1;
+    color:#64748b;
+    cursor:pointer;
+}
+.modal-close:hover{ color:#0f172a; }
+
+#modalMetode{
+    font-size:14px;
+    font-weight:700;
+    color:#1d4ed8;
+    background:#eef2ff;
+    padding:10px 14px;
+    border-radius:10px;
+    margin-bottom:16px;
+}
+
+#modalGambarWrap{
+    margin-bottom:16px;
+}
+
+#modalGambarWrap img{
+    width:100%;
+    max-height:340px;
+    object-fit:contain;
+    border-radius:12px;
+    border:1px solid #e2e8f0;
+    background:#f8fafc;
+}
+
+#modalNoBukti{
+    display:none;
+    background:#f0fdf4;
+    color:#166534;
+    padding:14px;
+    border-radius:10px;
+    font-size:14px;
+    margin-bottom:16px;
+}
+
+.modal-actions{
+    display:flex;
+    gap:12px;
+    margin-top:6px;
+}
+
+.btn-setuju,
+.btn-tolak{
+    flex:1;
+    padding:13px 16px;
+    border:none;
+    border-radius:12px;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.2s;
+    color:#fff;
+}
+
+.btn-setuju{ background:#16a34a; }
+.btn-setuju:hover{ background:#15803d; }
+
+.btn-tolak{ background:#ef4444; }
+.btn-tolak:hover{ background:#dc2626; }
 
 /* ===== BOOKING SELESAI ===== */
 .section-selesai { margin-top: 40px; }
@@ -337,6 +506,7 @@ select {
     <th>Destinasi</th>
     <th>Tanggal</th>
     <th>Jumlah</th>
+    <th>Catatan</th>
     <th>Guide</th>
     <th>Status</th>
     <th>Assign Guide</th>
@@ -367,6 +537,7 @@ if(mysqli_num_rows($query) > 0){
     <td><?= htmlspecialchars($row['destinasi_nama']) ?></td>
     <td><?= !empty($row['tanggal']) ? date('d-m-Y', strtotime($row['tanggal'])) : '-' ?></td>
     <td><?= $row['jumlah_orang'] ?> Orang</td>
+    <td class="catatan-cell"><?= !empty($row['catatan']) ? htmlspecialchars($row['catatan']) : '-' ?></td>
     <td><?= !empty($row['guide_nama']) ? htmlspecialchars($row['guide_nama']) : '-' ?></td>
     <td><?php
         $status = $row['status'];
@@ -375,12 +546,39 @@ if(mysqli_num_rows($query) > 0){
         elseif($status == "Guide Menolak")    echo "<span class='status status-red'>Guide Menolak</span>";
         else                                  echo "<span class='status status-yellow'>".$status."</span>";
     ?></td>
-    <td><?php if($row['status'] == 'Diterima Guide'): ?>
+    <td><?php
+
+        $sudah_terkunci = ($row['status'] == 'Diterima Guide');
+        $verif          = $row['verifikasi_bayar'] ?? 'menunggu';
+
+        if($sudah_terkunci){
+        ?>
         <span style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;
             background:#dcfce7;color:#166534;border-radius:10px;font-size:13px;font-weight:600;">
             &#10003; Guide Terkunci
         </span>
-    <?php else: ?>
+        <?php
+        } elseif($verif !== 'setuju'){
+            // Default ('menunggu') maupun setelah 'tolak' -> tampil tombol Lihat Bukti Pembayaran lagi
+
+            $mt         = $row['metode_bayar'] ?? '';
+            $mt_label   = $metode_label[$mt] ?? strtoupper($mt);
+            $bukti_file = $row['bukti_pembayaran'] ?? '';
+            $bukti_url  = (!empty($bukti_file) && file_exists($bukti_dir.$bukti_file))
+                          ? $bukti_dir.htmlspecialchars($bukti_file, ENT_QUOTES)
+                          : '';
+        ?>
+        <button type="button" class="btn-lihat-bukti"
+            onclick="bukaModalBukti(
+                <?= (int)$row['id'] ?>,
+                '<?= $bukti_url ?>',
+                '<?= htmlspecialchars($mt_label, ENT_QUOTES) ?>'
+            )">
+            &#128065; Lihat Bukti Pembayaran
+        </button>
+        <?php
+        } else { // verif === 'setuju' -> form assign guide seperti biasa
+        ?>
         <form method="POST">
         <input type="hidden" name="booking_id" value="<?= $row['id'] ?>">
         <select name="guide_id" required>
@@ -434,14 +632,15 @@ if(mysqli_num_rows($query) > 0){
         </select>
         <button type="submit" name="assign" class="btn btn-primary">Assign</button>
         </form>
-    <?php endif; ?>
+        <?php
+        } ?>
     </td>
 </tr>
 <?php
     }
 } else { ?>
 <tr>
-    <td colspan="8" style="padding:35px;text-align:center;">Belum ada booking aktif.</td>
+    <td colspan="9" style="padding:35px;text-align:center;">Belum ada booking aktif.</td>
 </tr>
 <?php } ?>
 
@@ -563,11 +762,74 @@ if(mysqli_num_rows($query) > 0){
 </div><!-- /.main-content -->
 </div><!-- /.layout -->
 
+<!-- ============================================
+     MODAL: LIHAT BUKTI PEMBAYARAN
+============================================ -->
+<div class="modal-overlay" id="modalBukti">
+    <div class="modal-box">
+        <button type="button" class="modal-close" onclick="tutupModalBukti()">&times;</button>
+        <h3>Verifikasi Pembayaran</h3>
+
+        <div id="modalMetode"></div>
+
+        <div id="modalGambarWrap">
+            <img id="modalGambar" src="" alt="Bukti Pembayaran">
+        </div>
+
+        <div id="modalNoBukti">
+            Pembayaran tunai (kas) — tidak ada bukti upload. Silakan konfirmasi setelah menerima pembayaran secara langsung.
+        </div>
+
+        <form method="POST" id="formVerifikasi">
+            <input type="hidden" name="verifikasi_bayar" value="1">
+            <input type="hidden" name="booking_id" id="modalBookingId" value="">
+            <input type="hidden" name="keputusan" id="modalKeputusan" value="">
+            <div class="modal-actions">
+                <button type="submit" class="btn-setuju" onclick="document.getElementById('modalKeputusan').value='setuju'">
+                    &#10003; Setuju
+                </button>
+                <button type="submit" class="btn-tolak" onclick="document.getElementById('modalKeputusan').value='tolak'">
+                    &#10005; Tolak
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <script>
 
 var allRows    = document.querySelectorAll('.row-selesai');
 var grandTotal = <?= $grand_total ?>;
+
+/* ── Modal Bukti Pembayaran ── */
+function bukaModalBukti(id, buktiUrl, metodeLabel){
+    document.getElementById('modalBookingId').value = id;
+    document.getElementById('modalKeputusan').value = '';
+    document.getElementById('modalMetode').textContent = 'Metode Pembayaran: ' + metodeLabel;
+
+    var imgWrap = document.getElementById('modalGambarWrap');
+    var img     = document.getElementById('modalGambar');
+    var noBukti = document.getElementById('modalNoBukti');
+
+    if(buktiUrl){
+        img.src = buktiUrl;
+        imgWrap.style.display = 'block';
+        noBukti.style.display = 'none';
+    } else {
+        imgWrap.style.display = 'none';
+        noBukti.style.display = 'block';
+    }
+
+    document.getElementById('modalBukti').style.display = 'flex';
+}
+
+function tutupModalBukti(){
+    document.getElementById('modalBukti').style.display = 'none';
+}
+
+document.getElementById('modalBukti').addEventListener('click', function(e){
+    if(e.target === this) tutupModalBukti();
+});
 
 /* ── Helpers tanggal ── */
 function getTodayStr(){

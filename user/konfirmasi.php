@@ -3,11 +3,15 @@
 //  Rinjani Guide — konfirmasi.php  (folder: user/)
 //  Step 2 dari 3: Konfirmasi Pesanan
 // ============================================================
+ob_start(); // pastikan header() selalu bisa jalan walau ada output tak sengaja
 session_start();
 
 // ── Guard: wajib punya data dari booking.php ─────────────────
 if (empty($_SESSION['booking_form']) || empty($_SESSION['booking_dest'])) {
+    if (ob_get_level() > 0) { ob_end_clean(); }
     header('Location: booking.php');
+    echo '<script>window.location.href="booking.php";</script>';
+    echo '<noscript><meta http-equiv="refresh" content="0;url=booking.php"></noscript>';
     exit;
 }
 
@@ -24,7 +28,10 @@ $action = $_POST['action'] ?? ($_GET['action'] ?? '');
 
 // Kembali ke booking
 if ($action === 'back') {
+    if (ob_get_level() > 0) { ob_end_clean(); }
     header('Location: booking.php');
+    echo '<script>window.location.href="booking.php";</script>';
+    echo '<noscript><meta http-equiv="refresh" content="0;url=booking.php"></noscript>';
     exit;
 }
 
@@ -54,7 +61,11 @@ if ($action === 'confirm') {
 
         $_SESSION['booking_kode']  = $kode;
         $_SESSION['booking_step']  = 3;
+
+        if (ob_get_level() > 0) { ob_end_clean(); }
         header('Location: pembayaran.php');
+        echo '<script>window.location.href="pembayaran.php";</script>';
+        echo '<noscript><meta http-equiv="refresh" content="0;url=pembayaran.php"></noscript>';
         exit;
     } else {
         $db_error = "Gagal menyimpan pesanan: " . mysqli_error($koneksi);
@@ -599,7 +610,8 @@ function tglIndo($tgl) {
         </form>
 
         <!-- Tombol Kembali -->
-        <form method="POST" action="booking.php">
+        <form method="POST" action="konfirmasi.php">
+            <input type="hidden" name="action" value="back">
             <button type="submit" class="btn-back">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <line x1="19" y1="12" x2="5" y2="12"/>
