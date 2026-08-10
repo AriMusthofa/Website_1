@@ -38,7 +38,7 @@ $q_terima = mysqli_query(
 );
 $diterima = mysqli_fetch_assoc($q_terima)['total'] ?? 0;
 
-// ── 5 Booking terbaru ───────────────────────────────────────────────────────
+// ── 4 Booking terbaru ───────────────────────────────────────────────────────
 $q_booking = mysqli_query(
     $koneksi,
     "SELECT
@@ -53,7 +53,7 @@ $q_booking = mysqli_query(
         ON booking.destinasi_id = destinasi.id
      WHERE booking.guide_id = '$guide_id'
      ORDER BY booking.id DESC
-     LIMIT 5"
+     LIMIT 4"
 );
 ?>
 
@@ -229,19 +229,19 @@ body{
     margin-left:var(--sidebar-w);
     width:calc(100vw - var(--sidebar-w));
     max-width:calc(100vw - var(--sidebar-w));
-    padding:36px 24px;
+    padding:30px 24px;
     overflow-x:hidden;
 }
 
 .page-title{
-    font-size:30px;
+    font-size:26px;
     font-weight:800;
 }
 
 .page-welcome{
     font-size:14px;
     color:var(--muted);
-    margin-top:5px;
+    margin-top:4px;
 }
 
 .page-welcome b{
@@ -252,27 +252,29 @@ body{
 .stats-grid{
     display:grid;
     grid-template-columns:repeat(3,1fr);
-    gap:20px;
-    margin:24px 0;
+    gap:18px;
+    margin:20px 0;
+    width:100%;
 }
 
 .stat-card{
     background:var(--card);
     border-radius:var(--radius);
-    padding:24px 22px;
+    padding:20px 20px;
     display:flex;
     align-items:center;
-    gap:18px;
+    gap:16px;
     box-shadow:0 1px 4px rgba(0,0,0,.06);
+    min-width:0;
 }
 
 .stat-icon{
-    width:52px;
-    height:52px;
+    width:48px;
+    height:48px;
     border-radius:14px;
     display:grid;
     place-items:center;
-    font-size:22px;
+    font-size:20px;
     flex-shrink:0;
 }
 
@@ -297,7 +299,7 @@ body{
 }
 
 .stat-value{
-    font-size:34px;
+    font-size:30px;
     font-weight:800;
 }
 
@@ -313,11 +315,8 @@ body{
     color:var(--green);
 }
 
-/* BOTTOM GRID */
+/* BOOKING TERBARU (full width, sejajar dengan stats-grid) */
 .bottom-grid{
-    display:grid;
-    grid-template-columns:minmax(0,1fr) 300px;
-    gap:20px;
     width:100%;
 }
 
@@ -326,13 +325,14 @@ body{
     border-radius:var(--radius);
     box-shadow:0 1px 4px rgba(0,0,0,.06);
     overflow:hidden;
+    width:100%;
 }
 
 .card-header{
     display:flex;
     align-items:center;
     gap:10px;
-    padding:20px 22px 16px;
+    padding:18px 22px 14px;
     border-bottom:1px solid var(--border);
 }
 
@@ -342,19 +342,20 @@ body{
 }
 
 .card-header h2{
-    font-size:17px;
+    font-size:16px;
     font-weight:700;
 }
 
 /* TABLE */
 .table-responsive{
     width:100%;
-    overflow-x:auto;
+    overflow:hidden;
 }
 
 table{
     width:100%;
     border-collapse:collapse;
+    table-layout:fixed;
 }
 
 thead tr{
@@ -367,7 +368,10 @@ thead th{
     font-size:13px;
     font-weight:600;
     text-align:left;
-    white-space:nowrap;
+}
+
+thead th:first-child{
+    width:80px;
 }
 
 tbody tr{
@@ -384,10 +388,11 @@ tbody tr:hover{
 }
 
 tbody td{
-    padding:14px 18px;
+    padding:13px 18px;
     font-size:14px;
     font-weight:500;
-    white-space:nowrap;
+    word-wrap:break-word;
+    overflow-wrap:break-word;
 }
 
 /* BADGE */
@@ -399,6 +404,7 @@ tbody td{
     border-radius:999px;
     font-size:12px;
     font-weight:600;
+    white-space:nowrap;
 }
 
 .badge-green{
@@ -433,7 +439,7 @@ tbody td{
 
 /* FOOTER */
 .card-footer{
-    padding:14px 22px;
+    padding:13px 22px;
     border-top:1px solid var(--border);
     text-align:center;
 }
@@ -450,67 +456,6 @@ tbody td{
 
 .card-footer a:hover{
     gap:10px;
-}
-
-/* QUICK MENU */
-.quick-menu{
-    background:var(--card);
-    border-radius:var(--radius);
-    padding:22px;
-    box-shadow:0 1px 4px rgba(0,0,0,.06);
-    height:max-content;
-}
-
-.qm-header{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-bottom:18px;
-}
-
-.qm-header i{
-    color:#eab308;
-    font-size:18px;
-}
-
-.qm-header h2{
-    font-size:17px;
-    font-weight:700;
-}
-
-.quick-btn{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:10px;
-    width:100%;
-    padding:14px;
-    border:none;
-    border-radius:10px;
-    font-family:inherit;
-    font-size:15px;
-    font-weight:700;
-    text-decoration:none;
-    margin-bottom:12px;
-    transition:.2s;
-}
-
-.quick-btn:last-child{
-    margin-bottom:0;
-}
-
-.quick-btn.green{
-    background:var(--green);
-    color:#fff;
-}
-
-.quick-btn.red{
-    background:var(--red);
-    color:#fff;
-}
-
-.quick-btn:hover{
-    transform:translateY(-2px);
 }
 
 /* NOTIFICATION */
@@ -549,27 +494,7 @@ tbody td{
     z-index:99;
 }
 
-/* ANIMATION */
-@keyframes fadeUp{
-    from{
-        opacity:0;
-        transform:translateY(16px);
-    }
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
-}
-
 /* RESPONSIVE */
-@media(max-width:1100px){
-
-    .bottom-grid{
-        grid-template-columns:1fr;
-    }
-
-}
-
 @media(max-width:900px){
 
     .stats-grid{
@@ -610,8 +535,12 @@ tbody td{
         gap:14px;
     }
 
-    .bottom-grid{
-        grid-template-columns:1fr;
+    table{
+        table-layout:auto;
+    }
+
+    .table-responsive{
+        overflow-x:auto;
     }
 }
 
@@ -693,7 +622,7 @@ tbody td{
             <table>
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>No</th>
                         <th>Customer</th>
                         <th>Destinasi</th>
                         <th>Status</th>
@@ -704,10 +633,10 @@ tbody td{
 
                 <?php if(mysqli_num_rows($q_booking) > 0): ?>
 
-                    <?php while($row = mysqli_fetch_assoc($q_booking)): ?>
+                    <?php $no = 1; while($row = mysqli_fetch_assoc($q_booking)): ?>
 
                     <tr>
-                        <td>#<?= $row['id']; ?></td>
+                        <td><?= $no++; ?></td>
 
                         <td>
                             <?= htmlspecialchars($row['customer_nama'] ?? '-') ?>
@@ -765,26 +694,6 @@ tbody td{
                 <i class="fas fa-arrow-right" style="font-size:11px"></i>
             </a>
         </div>
-
-    </div>
-
-    <!-- QUICK MENU -->
-    <div class="quick-menu">
-
-        <div class="qm-header">
-            <i class="fas fa-bolt"></i>
-            <h2>Quick Menu</h2>
-        </div>
-
-        <a href="booking.php" class="quick-btn green">
-            <i class="fas fa-calendar-check"></i>
-            Kelola Booking
-        </a>
-
-        <a href="../logout.php" class="quick-btn red">
-            <i class="fas fa-right-from-bracket"></i>
-            Logout
-        </a>
 
     </div>
 

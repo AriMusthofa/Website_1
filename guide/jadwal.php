@@ -11,6 +11,34 @@ $guide_id = intval($_SESSION['id'] ?? $_SESSION['user_id'] ?? 0);
 
 $guide_name = htmlspecialchars($_SESSION['nama'] ?? 'Guide');
 
+$today = date('Y-m-d');
+
+/* =========================
+   HELPER: FORMAT TANGGAL INDONESIA (tanpa tahun)
+========================= */
+
+if(!function_exists('tglSingkatId')){
+
+function tglSingkatId($tgl){
+
+    $hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+
+    $bulan = ['','Januari','Februari','Maret','April','Mei','Juni',
+              'Juli','Agustus','September','Oktober','November','Desember'];
+
+    $ts = strtotime($tgl);
+
+    if(!$ts) return '-';
+
+    $namaHari  = $hari[(int)date('w',$ts)];
+    $tanggal   = date('d',$ts);
+    $namaBulan = $bulan[(int)date('n',$ts)];
+
+    return $namaHari.', '.$tanggal.' '.$namaBulan;
+}
+
+}
+
 /* =========================
    STATISTIK JADWAL
 ========================= */
@@ -56,7 +84,7 @@ $q_jadwal = mysqli_query($koneksi,"
     LEFT JOIN destinasi
         ON booking.destinasi_id = destinasi.id
     WHERE booking.guide_id='$guide_id'
-    ORDER BY booking.tanggal ASC
+    ORDER BY booking.tanggal DESC
 ");
 ?>
 <!DOCTYPE html>
@@ -187,13 +215,6 @@ body{
     width:calc(100% - 230px);
     min-height:100vh;
     padding:30px;
-}
-
-.main{
-    margin-left:230px;
-    width:calc(100% - 230px);
-    min-height:100vh;
-    padding:30px;
     background:#f1f5f9;
 }
 
@@ -244,6 +265,7 @@ body{
     margin-top:25px;
     background:white;
     border-radius:16px;
+    border:1px solid var(--border);
     box-shadow:0 2px 10px rgba(0,0,0,.05);
     overflow:hidden;
 }
@@ -293,8 +315,12 @@ tbody td{
     font-size:14px;
 }
 
-tbody tr:hover{
+tbody tr:nth-child(even){
     background:#f8fafc;
+}
+
+tbody tr:hover{
+    background:#eef2ff;
 }
 
 /* =========================
@@ -327,31 +353,6 @@ tbody tr:hover{
 .badge-primary{
     background:#dbeafe;
     color:#1d4ed8;
-}
-
-/* =========================
-   TODAY CARD
-========================= */
-
-.today-card{
-    margin-top:25px;
-    background:linear-gradient(
-        135deg,
-        #2563eb,
-        #1d4ed8
-    );
-    color:white;
-    border-radius:18px;
-    padding:25px;
-}
-
-.today-card h2{
-    font-size:22px;
-    margin-bottom:8px;
-}
-
-.today-card p{
-    opacity:.9;
 }
 
 /* =========================
@@ -434,21 +435,9 @@ tbody tr:hover{
 
     </div>
 
-    <!-- TODAY CARD -->
-
-    <div class="today-card">
-        <h2>
-            <i class="fas fa-calendar-check"></i>
-            Jadwal Pendakian
-        </h2>
-
-        <p>
-            Daftar seluruh booking yang menjadi tanggung jawab guide.
-        </p>
-    </div>
-
-    
     <!-- TABEL JADWAL -->
+
+    <div class="card">
 
         <div class="card-header">
             <i class="fas fa-calendar-days"></i>
@@ -461,13 +450,12 @@ tbody tr:hover{
 
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>No</th>
                         <th>Customer</th>
                         <th>Whatsapp</th>
                         <th>Destinasi</th>
                         <th>Tanggal</th>
                         <th>Peserta</th>
-                        <th>Total</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -476,12 +464,12 @@ tbody tr:hover{
 
                 <?php if(mysqli_num_rows($q_jadwal) > 0): ?>
 
-                    <?php while($row = mysqli_fetch_assoc($q_jadwal)): ?>
+                    <?php $no = 1; while($row = mysqli_fetch_assoc($q_jadwal)): ?>
 
                     <tr>
 
                         <td>
-                            #<?= $row['id']; ?>
+                            <?= $no++; ?>
                         </td>
 
                         <td>
@@ -497,7 +485,7 @@ tbody tr:hover{
                         </td>
 
                         <td>
-                            <?= date('d M Y', strtotime($row['tanggal'])); ?>
+                            <?= tglSingkatId($row['tanggal']); ?>
                         </td>
 
                         <td>
@@ -505,26 +493,15 @@ tbody tr:hover{
                         </td>
 
                         <td>
-                            Rp <?= number_format($row['total_harga'],0,',','.'); ?>
-                        </td>
-
-                        <td>
 
                             <?php
 
-                            $status = $row['status'];
+                            $sudah_lewat = ($row['tanggal'] < $today);
 
-                            if($status == 'Diterima Guide'){
-                                echo '<span class="badge badge-success">Diterima</span>';
-                            }
-                            elseif($status == 'Menunggu Guide'){
+                            if($sudah_lewat){
+                                echo '<span class="badge badge-success">Selesai</span>';
+                            } else {
                                 echo '<span class="badge badge-warning">Menunggu</span>';
-                            }
-                            elseif($status == 'Guide Menolak'){
-                                echo '<span class="badge badge-danger">Ditolak</span>';
-                            }
-                            else{
-                                echo '<span class="badge badge-primary">'.$status.'</span>';
                             }
 
                             ?>
@@ -538,7 +515,7 @@ tbody tr:hover{
                 <?php else: ?>
 
                     <tr>
-                        <td colspan="8">
+                        <td colspan="7">
 
                             <div class="empty">
                                 <i class="fas fa-calendar-xmark"
@@ -559,7 +536,9 @@ tbody tr:hover{
 
         </div>
 
-                </main>
+    </div>
+
+</div>
 
 </body>
 </html>

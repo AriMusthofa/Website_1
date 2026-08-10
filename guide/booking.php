@@ -13,6 +13,8 @@ htmlspecialchars(
 $_SESSION['nama'] ?? 'Guide'
 );
 
+$today = date('Y-m-d');
+
 /* =====================================================
 AKSI TERIMA / TOLAK
 ===================================================== */
@@ -104,45 +106,20 @@ exit();
 }
 
 /* ============================================================
-   LOAD semua booking milik guide ini
+   Hitung badge notif (booking yg masih 'Menunggu Guide')
    ============================================================ */
-$q_notif = mysqli_query(
-
-$koneksi,
-
-"SELECT
-
-booking.*,
-
-users.nama AS customer_nama,
-
-destinasi.name AS destinasi_nama
-
-FROM booking
-
-LEFT JOIN users
-ON booking.user_id = users.id
-
-LEFT JOIN destinasi
-ON booking.destinasi_id = destinasi.id
-
-WHERE
-
-booking.guide_id='$guide_id'
-
-AND booking.status='Menunggu Guide'
-
-ORDER BY booking.id DESC"
-
-);
-
-// Hitung badge notif (booking yg masih 'Menunggu Guide')
 $q_notif = mysqli_query($koneksi,
     "SELECT COUNT(*) AS total FROM booking
      WHERE guide_id = '$guide_id' AND status = 'Menunggu Guide'"
 );
 $notif_count = mysqli_fetch_assoc($q_notif)['total'] ?? 0;
 
+/* ============================================================
+   LOAD booking milik guide ini:
+   - Tanggal besok dan seterusnya -> selalu tampil
+   - Tanggal hari ini / sudah lewat -> tampil HANYA jika belum
+     diberi aksi (masih 'Menunggu Guide' atau 'Guide Ditugaskan')
+   ============================================================ */
 $q_booking = mysqli_query(
     $koneksi,
     "SELECT
@@ -155,7 +132,14 @@ $q_booking = mysqli_query(
     LEFT JOIN destinasi
         ON booking.destinasi_id = destinasi.id
     WHERE booking.guide_id='$guide_id'
-    ORDER BY booking.id DESC"
+    AND (
+        booking.tanggal > '$today'
+        OR (
+            booking.tanggal <= '$today'
+            AND booking.status IN ('Menunggu Guide','Guide Ditugaskan')
+        )
+    )
+    ORDER BY booking.tanggal ASC, booking.id DESC"
 );
 ?>
 <!DOCTYPE html>
@@ -363,7 +347,7 @@ $q_booking = mysqli_query(
             <table id="bookingTable">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>No</th>
                         <th>Customer</th>
                         <th>Destinasi</th>
                         <th>Tanggal</th>
@@ -376,6 +360,7 @@ $q_booking = mysqli_query(
                 <?php
                 mysqli_data_seek($q_booking, 0);
                 if (mysqli_num_rows($q_booking) > 0):
+                    $no = 1;
                     while ($row = mysqli_fetch_assoc($q_booking)):
                         $s    = $row['status'];
                         $cls  = match($s) {
@@ -394,7 +379,7 @@ $q_booking = mysqli_query(
                     htmlspecialchars($row['customer_nama'] ?? '') . ' ' .
                     htmlspecialchars($row['destinasi_nama'] ?? '')
                 ) ?>" data-status="<?= htmlspecialchars($s) ?>">
-                    <td><b>#<?= $row['id'] ?></b></td>
+                    <td><b><?= $no++ ?></b></td>
                     <td><?= htmlspecialchars($row['customer_nama'] ?? '-') ?></td>
                     <td>
                         <?= htmlspecialchars($row['destinasi_nama'] ?? '-') ?>
